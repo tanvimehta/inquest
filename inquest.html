@@ -4,6 +4,13 @@
 		<meta charset="UTF-8" />
 		<title> Inquest </title>
 		<style>
+			table {
+	            font-family: sans-serif;
+	            width: 50%;
+	            border-color: black;
+	            float: left;
+			}
+
 			form {
 				text-align: center;
 			}
@@ -23,10 +30,10 @@
 
 			input[type="button"] {
 				border: 1px solid #E7BF93;
-				background-color: black;
-				color: #EDEDED;
+				background-color: grey;
+				color: black;
 				border: 1px solid #777777;
-				width: 200px;
+				width: 100px;
 			}
 
 			#bookform {
@@ -50,16 +57,54 @@
 				border: solid #777777;
 				width: 200px;
 			}
-
+			img {
+				width: 100px;
+				height: 100px;
+				float: right;
+			}
 		</style>
 	</head>
 	<body>
-		<h1>Inquest</h1>
-		<form id = "query">
-				<p><span class = "textbox"><input type = "text" name = "booktitle" id = "book-title"/></span></p>
-				<p><input type = "button" name = "search" value = "Search" onclick="searchBook();"/>
-		</form>
+		<div id = "page">
+			<div id="titlebar">
+				<img src="search.jpg" alt="Inquest Logo">
+				<h1>Inquest</h1>
+			</div>
+			<form id = "query">
+					<p><span class = "textbox"><input type = "text" name = "keywords" id = "search-query"/></span></p>
+					<p><input type = "button" name = "search" value = "Search" onclick="printResult();"/>
+			</form>
+		</div>
+
 		<script type="text/javascript">
+
+			function printResult() {
+				var query = document.getElementById('search-query').value;
+				var words = query.match(/\S+/g);
+				var body = document.getElementById("page");
+
+				if (words.length > 1) {
+					resultsTable = "<h3>" + query + "</h3>" + "<table id = \"results\" border = \"1\"><tr><td>Word</td><td>Count</td></tr>";
+
+					if (words != null) {
+						words.sort();
+
+						leftIndex = 0;
+						for (index = 0; index < words.length; index++) {
+							if (words[index] != words[index+1]) {
+								count = index - leftIndex + 1;
+								leftIndex = index + 1;
+								resultsTable = resultsTable.concat("<tr><td>" + words[index] + "</td>" + "<td>" + count + "</td></tr>");
+							}
+						}
+						resultsTable = resultsTable.concat("</table>");
+					}
+				} else {
+					resultsTable = "<h3>" + query + "</h3>";
+				}
+
+				body.innerHTML = resultsTable;
+			}
 		</script>
 
 	</body>
