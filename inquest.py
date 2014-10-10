@@ -2,33 +2,35 @@
 from bottle import route, get, post, request, run, static_file # or route
 
 wordList = []
-@route('/static/<filename>') 
-def server_static(filename):
-    return static_file(filename, root='static/')
-
-@get('/')
-def inquest() :
-    return """ <head> <link rel="stylesheet" type="text/css" href="/static/inquest.css"> </head>
+searchForm = """<head> <link rel="stylesheet" type="text/css" href="/static/inquest.css"></head>
         <body>
         <div id = "page">
             <div id="titlebar">
                 <img src="/static/search.jpg" alt="Inquest Logo">
                 <h1>Inquest</h1>
             </div>
-            <form action = "/" method = "post" id = "query">
+            <form action = "/results" method = "get" id = "query">
                     <p><span class = "textbox"><input type = "text" name = "keywords" id = "search-query"/></span></p>
                     <p><input type = "submit" name = "search" value = "Search"/>
-            </form>
-        </div>
-        </body>"""
+            </form>"""
 
-@post('/')
+@route('/static/<filename>') 
+def server_static(filename):
+    return static_file(filename, root='static/')
+
+@get('/')
+def inquest() :
+    return  searchForm + "</div>"+ createHistoryTable() + "</body>"
+
+@get('/results')
 def do_inquest() :
     global wordList
-    query = request.forms.get('keywords')
+    query = request.query['keywords']
     words = query.split()
+    if len(words) == 0:
+        return searchForm + "<p>Please enter a search query.</p></div>" + createHistoryTable() + "</body>"
     words.sort()
-    resultsTable = "<h3>" + query + "</h3><table style = \"float: left\" id = \"result\"><tr><td>Word</td><td>Count</td></tr>"
+    resultsTable = "<h3>" + query + "</h3><table name = \"results\"><tr><td> Word</td><td> Count</td></tr>"
     leftIndex = 0
     count = 0
     if len(words) == 1:
@@ -52,14 +54,7 @@ def do_inquest() :
         resultsTable = resultsTable + "<tr><td>" + words[len(words)-1] + "</td>" + "<td>" + str(count) + "</td></tr>"
         resultsTable = resultsTable + "</table>"
     wordList.sort(key=lambda x: x[1],reverse=True)
-    historyTable = createHistoryTable()
-    return "<body>" + resultsTable + historyTable + "</body>"
-
-def getKey(item):
-    return item[0]
-
-def getValue(item):
-    return item[1]
+    return """<head><link rel="stylesheet" type="text/css" href="/static/resultspage.css"></head><body>""" + resultsTable + "</body>"
 
 def updateWordList (word, count):
     global wordList
@@ -78,15 +73,11 @@ def updateWordList (word, count):
 
 def createHistoryTable ():
     global wordList
-    historyTable = "<table style = \"float: right\" id = \"history\"><tr><td>Word</td><td>Count</td></tr>"
+    historyTable = "<h3>Search History</h3><table name = \"history\"><tr><td>Word</td><td>Count</td></tr>"
     max_output = min(20,len(wordList))
     for i in range(0, max_output):
         historyTable = historyTable + "<tr><td>" + wordList[i][0] + "</td>" + "<td>" + str(wordList[i][1]) + "</td></tr>"
     return historyTable
-
-# l = [[2, 3], [6, 7], [3, 34], [24, 64], [1, 43]]
-# sorted(l, key=getKey)
-# [[1, 43], [2, 3], [3, 34], [6, 7], [24, 64]]
 
 run(host='localhost', port=8080, debug=True)
 

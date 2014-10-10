@@ -1,13 +1,18 @@
-table {
+			table, th, td {
 	            font-family: sans-serif;
-	            width: 50%;
-	            border-color: black;
-	            float: left;
+	            width: 30%;
+	            border: 1px solid black;
+	            float: right;
+	            margin-top: 10px;
+	            padding-top: 0px;
+	            padding-right: 0px;
+	            margin-right: 0px;
 			}
 
 			form {
 				text-align: center;
 			}
+
 			h1 {
 				font-weight: bold;
 				text-align: center;
@@ -30,22 +35,6 @@ table {
 				width: 100px;
 			}
 
-			#bookform {
-				text-align: center;
-			}
-
-			textarea {
-	  			border: 1px solid #777777; 
-				padding: 10px;
-				height: 300px;
-				width: 500px;
-	   			resize: none;
-			}
-
-			#bookform {
-				padding-left: 50px;
-			}
-
 			input[type="text"] {
 				border-width: 0px;
 				border: solid #777777;
@@ -54,5 +43,21 @@ table {
 			img {
 				width: 100px;
 				height: 100px;
-				float: right;
+				float: left;
+				padding-left: 100px;
+			}
+
+			#page {
+				border-top: 0px;
+				padding-top: 0px;
+				margin-top: 0px;
+				width: 60%;
+				float: left;
+				border-right: 1px solid #B8B8B8;
+				padding-right: 70px;
+			}
+
+			h3 {
+				padding-top: 85px;
+				color: #4682B4;
 			}
