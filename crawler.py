@@ -117,6 +117,7 @@ class crawler(object):
         self._curr_doc_id = 0
         self._font_size = 0
         self._curr_words = None
+        self._curr_title = ""
 
         # get all urls into the queue
         try:
@@ -190,6 +191,7 @@ class crawler(object):
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
         title_text = self._text_of(elem).strip()
+        self._curr_title = title_text
         print "document title="+ repr(title_text)
 
         # TODO update document title for document id self._curr_doc_id
@@ -336,6 +338,7 @@ class crawler(object):
                 self._curr_words = [ ]
                 self._index_document(soup)
                 self._add_words_to_document()
+                self._document_index[doc_id] = repr(self._curr_title)
                 print "    url="+repr(self._curr_url)
 
             except Exception as e:
