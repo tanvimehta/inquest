@@ -10,7 +10,7 @@ searchForm = """<head> <link rel="stylesheet" type="text/css" href="/static/inqu
                 <h1>Inquest</h1>
             </div>
             <form action = "/results" method = "get" id = "query">
-                    <p><span class = "textbox"><input type = "text" name = "keywords" id = "search-query"/></span></p>
+                    <p><span class = "textbox"><input type = "text" name = "keywords" id = "keywords"/></span></p>
                     <p><input type = "submit" name = "search" value = "Search"/>
             </form>"""
 
@@ -30,7 +30,7 @@ def do_inquest() :
     if len(words) == 0:
         return searchForm + "<p>Please enter a search query.</p></div>" + createHistoryTable() + "</body>"
     words.sort()
-    resultsTable = "<h3>" + query + "</h3><table name = \"results\"><tr><td> Word</td><td> Count</td></tr>"
+    resultsTable = "<h3>Search for \"" + query + "\"</h3><table id = \"results\"><tr><td> Word</td><td> Count</td></tr>"
     leftIndex = 0
     count = 0
     if len(words) == 1:
@@ -73,7 +73,7 @@ def updateWordList (word, count):
 
 def createHistoryTable ():
     global wordList
-    historyTable = "<h3>Search History</h3><table name = \"history\"><tr><td>Word</td><td>Count</td></tr>"
+    historyTable = "<h3>Search History</h3><table id = \"history\"><tr><td>Word</td><td>Count</td></tr>"
     max_output = min(20,len(wordList))
     for i in range(0, max_output):
         historyTable = historyTable + "<tr><td>" + wordList[i][0] + "</td>" + "<td>" + str(wordList[i][1]) + "</td></tr>"
