@@ -1,7 +1,33 @@
 
+from oauth2client.client import OAuth2WebServerFlow
+from oauth2client.client import flow_from_clientsecrets
+from googleapiclient.errors import HttpError
+from googleapiclient.discovery import build
+
+import bottle 
 from bottle import route, get, post, request, run, static_file # or route
 
+CLIENT_ID = '278908014431-lj5cbvaltqh8vpl9u697r12qibo67kf9.apps.googleusercontent.com'
+CLIENT_SECRET = '83bnG_gonLkb1Pg8hTMfGKJs'
+
 wordList = []
+
+loginForm = """<head> <link rel="stylesheet" type="text/css" href="/static/inquest.css"></head>
+        <body>
+        <div id = "page">
+            <div id="titlebar">
+                <img src="/static/search.jpg" alt="Inquest Logo">
+                <h1>Inquest</h1>
+            </div>
+            <form action = "/authenticate" method = "get" id = "query">
+                    <p><span class = "textbox"><input type = "text" name = "username" id = "username"/></span></p>
+                    <p><span class = "textbox"><input type = "password" name = "username" id = "username"/></span></p>
+                    <p><input type = "submit" name = "login" value = "login"/>
+            </form>
+            <form action = "/guest" method = "get" id = "query">
+                    <p><input type = "submit" name = "guest" value = "Guest"/>
+            </form>"""
+
 searchForm = """<head> <link rel="stylesheet" type="text/css" href="/static/inquest.css"></head>
         <body>
         <div id = "page">
@@ -18,9 +44,39 @@ searchForm = """<head> <link rel="stylesheet" type="text/css" href="/static/inqu
 def server_static(filename):
     return static_file(filename, root='static/')
 
+@get('/authenticate')
+def authenticate():
+    flow = flow_from_clientsecrets("client_secrets.json",
+    scope='https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email',
+    redirect_uri="localhost:8080/redirect")
+    uri = flow.step1_get_authorize_url()
+    bottle.redirect(str(uri))
+
+
+
+@route('/redirect')
+def redirect_page():
+    code = request.query.get('code', '')
+    flow = OAuth2WebServerFlow( client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET,
+    scope=SCOPE,
+    redirect_uri=REDIRECT_URI)
+    credentials = flow.step2_exchange(code)
+    token = credentials.id_token['sub']
+
+
+
 @get('/')
+def login():
+    return loginForm
+
+@get('/logged_in')
 def inquest() :
     return  searchForm + "</div>"+ createHistoryTable() + "</body>"
+
+@get('/guest')
+def guest():
+    return searchForm
 
 @get('/results')
 def do_inquest() :
