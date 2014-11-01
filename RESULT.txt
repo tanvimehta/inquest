@@ -1,0 +1,17 @@
+1. The maximum continuous instructions without drops is 20
+	ab -n 1000 -c 20 http://54.172.218.21/results?keywords=hello+&search=Search
+
+2. Maximum Requests per cycle achieved with the above commands 
+	Requests per second:    257.87 [#/sec] (mean)
+
+3. Response Times: 
+99 percentile = 441 ms
+average response time = 71 ms
+
+
+4. The following numbers are daily averages
+(a) CPU Utilization 4.07 percent
+(b) Memory : free : 40528 Buff 55252 Cache 373308 
+(c) Disk IO = 0 
+(d) Network In = 101729 Bytes 
+    Network Out = 59100 Bytes 

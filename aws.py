@@ -8,7 +8,7 @@ def init():
 	key = conn.create_key_pair('keyPair0')
 	key.save('.')
 
-	group = conn.create_security_group("csc326-group51", "web search called inquest")
+	group = conn.create_security_group("csc326-group5", "web search called inquest")
 
 	group.authorize(ip_protocol='icmp', from_port=-1, to_port=-1, cidr_ip='0.0.0.0/0')
 	group.authorize(ip_protocol='tcp', from_port=22, to_port=22, cidr_ip='0.0.0.0/0')
