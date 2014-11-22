@@ -24,6 +24,8 @@ import urlparse
 from BeautifulSoup import *
 from collections import defaultdict
 import re
+from pagerank import page_rank
+import sqlite3 as lite
 
 def attr(elem, attr):
     """An html attribute from an html element. E.g. <a href="">, then
@@ -54,6 +56,10 @@ class crawler(object):
         self._inverted_index = { }
         self._word_index = { }
         self._doc_id_url = { }
+        self._links = [ ]
+        self._links_dict = { }
+        self._next_link_id = 1
+        self._page_rank = defaultdict(lambda: float(initial_pr))
 
         # functions to call when entering and exiting specific tags
         self._enter = defaultdict(lambda *a, **ka: self._visit_ignore)
@@ -186,6 +192,7 @@ class crawler(object):
     def add_link(self, from_doc_id, to_doc_id):
         """Add a link into the database, or increase the number of links between
         two pages in the database."""
+        self._links.append((from_doc_id, to_doc_id))
         # TODO
 
     def _visit_title(self, elem):
@@ -287,7 +294,26 @@ class crawler(object):
 
                 tag_name = tag.name.lower()
 
-                # ignore this tag and everything in it
+                # if tag_name == 'a':
+                #     curr_link_id = 0 
+                #     new_link_id = 0
+                #     if self._curr_url in self._links_dict: 
+                #         curr_link_id = self._links_dict[self._curr_url]
+                #     else: 
+                #         curr_link_id = self._next_link_id
+                #         self._links_dict[self._curr_url] = self._next_link_id 
+                #         self._next_link_id = self._next_link_id+1
+
+                #     new_link = tag.get('href')
+
+                #     if new_link in self._links_dict: 
+                #         new_link_id = self._links_dict[new_link]
+                #     else: 
+                #         new_link_id = self._next_link_id
+                #         self._links_dict[new_link] = self._next_link_id 
+                #         self._next_link_id = self._next_link_id+1
+                #     self._links.append((curr_link_id, new_link_id))
+
                 if tag_name in self._ignored_tags:
                     if tag.nextSibling:
                         tag = NextTag(tag.nextSibling)
@@ -347,6 +373,7 @@ class crawler(object):
             finally:
                 if socket:
                     socket.close()
+
     def get_inverted_index(self):
         return self._inverted_index
 
@@ -359,6 +386,113 @@ class crawler(object):
                 url_set.add(self._doc_id_url[j])
             resolved_inverted_index[word] = url_set
         return resolved_inverted_index
+
+    def get_page_rank(self):
+        link_page_rank = page_rank(self._links)
+        # inv_dict = dict((v,k) for k, v in self._links_dict.iteritems())
+        # for l_id, rank in link_page_rank.iteritems(): 
+        #     link_url = inv_dict[l_id]
+        #     if link_url in self._doc_id_cache:
+        #         doc_id = self._doc_id_cache[link_url]
+        #         self._page_rank[doc_id] = rank
+        # for d_url in self._doc_id_cache: 
+        #     doc_id = self._doc_id_cache[d_url]
+        #     if doc_id not in self._page_rank: 
+        #         self._page_rank[doc_id] = 0
+        for doc_id, rank in link_page_rank.iteritems():
+            self._page_rank[doc_id] = rank
+
+        for url, doc_id in self._doc_id_cache.iteritems():
+            if doc_id not in self._page_rank: 
+                self._page_rank[doc_id] = 0
+
+
+    def write_to_database(self):
+        con = lite.connect('keywords.db')
+        cur = con.cursor()
+
+        # Create Lexicon in database
+        cur.execute('CREATE TABLE IF NOT EXISTS lexicon(word_id INTEGER PRIMARY KEY, word TEXT);')
+        for word, wordid in self._word_id_cache.iteritems(): 
+            cur.execute('INSERT OR IGNORE INTO lexicon VALUES (?, ?)',(wordid, word))
+
+        #create page rank in database
+        cur.execute('CREATE TABLE IF NOT EXISTS page_rank(doc_id INTEGER PRIMARY KEY, rank REAL);')
+        for doc_id, rank in self._page_rank.iteritems(): 
+            cur.execute('INSERT OR IGNORE INTO page_rank VALUES (?,?)', (doc_id, rank))
+
+        # Crate document_index in database
+        cur.execute('CREATE TABLE IF NOT EXISTS document_index(doc_id INTEGER PRIMARY KEY, url TEXT, title TEXT);')
+        for url, doc_id in self._doc_id_cache.iteritems(): 
+            title = 'None'
+            if doc_id in self._document_index: 
+                title = self._document_index[doc_id]
+            cur.execute('INSERT OR IGNORE INTO document_index VALUES (?, ?, ?)',(doc_id, url, title))
+
+        # Create inverted index in database
+        cur.execute('CREATE TABLE IF NOT EXISTS inverted_index(word_id INTEGER PRIMARY KEY, doc_id_set TEXT);')
+        for word_id, doc_id_set in self._inverted_index.iteritems(): 
+            doc_id_set_str = repr(doc_id_set)
+            cur.execute('INSERT OR REPLACE INTO inverted_index VALUES (?, ?)',(word_id, doc_id_set_str))
+
+        # Create other tables that are needed just in backend 
+        cur.execute('CREATE TABLE IF NOT EXISTS links(from_id INTEGER, to_id INTEGER)')
+        for (from_id, to_id) in self._links:
+            cur.execute('INSERT OR IGNORE INTO links VALUES (?, ?)',(from_id, to_id))
+
+        cur.execute('CREATE TABLE IF NOT EXISTS links_dict(link_id INTEGER PRIMARY KEY, url TEXT)')
+        for url, link_id in self._links_dict.iteritems():
+            cur.execute('INSERT OR IGNORE INTO links_dict VALUES (?, ?)',(link_id, url))
+
+
+        cur.execute('DROP TABLE IF EXISTS counters')
+        con.commit()
+        
+        cur.execute('CREATE TABLE IF NOT EXISTS counters(id INTEGER PRIMARY KEY, value INTEGER)')
+        cur.execute('INSERT INTO counters(value) VALUES (?)', (self._mock_next_word_id,))
+        cur.execute('INSERT INTO counters(value) VALUES (?)', (self._mock_next_doc_id,))
+        cur.execute('INSERT INTO counters(value) VALUES (?)', (self._next_link_id,))
+
+
+        con.commit()
+        con.close()
+
+    def read_from_database(self):
+        con = lite.connect('keywords.db')
+        cur = con.cursor()
+
+        cur.execute('SELECT * FROM lexicon')
+        inv_word_id_cache = cur.fetchall()
+        self._word_id_cache = dict((v,k) for (k,v) in inv_word_id_cache)
+
+        cur.execute('SELECT * FROM document_index')
+        inv_doc_id_cache = cur.fetchall()
+        self._doc_id_cache = dict((v,k) for (k,v,l) in inv_doc_id_cache)
+        self._document_index = dict((k,l) for (k,v,l) in inv_doc_id_cache)
+
+        cur.execute('SELECT * FROM inverted_index')
+        ii_cache= cur.fetchall()
+        for wordid, doc_id_set_str in ii_cache: 
+            doc_id_set = eval(doc_id_set_str)
+            self._inverted_index[wordid] = doc_id_set
+
+        cur.execute('SELECT * FROM links')
+        self._links = cur.fetchall()
+
+        cur.execute('SELECT * FROM links_dict')
+        inv_links_dict = cur.fetchall()
+        self._links_dict = dict((v,k) for (k,v) in inv_links_dict)
+
+        cur.execute('SELECT * FROM counters')
+        (count_id, count) = cur.fetchone()
+        self._mock_next_word_id = count 
+        (count_id, count) = cur.fetchone()
+        self._mock_next_doc_id = count 
+        (count_id, count) = cur.fetchone()
+        self._next_link_id = count 
+        con.commit()
+        con.close()
+
 
 if __name__ == "__main__":
     bot = crawler(None, "urls.txt")
