@@ -18,11 +18,17 @@ def init(d):
 	# key = conn.create_key_pair('keyPair1')
 	# key.save('.')
 
-	group = conn.create_security_group("csc326-group5", "web search called inquest")
-
-	group.authorize(ip_protocol='icmp', from_port=-1, to_port=-1, cidr_ip='0.0.0.0/0')
-	group.authorize(ip_protocol='tcp', from_port=22, to_port=22, cidr_ip='0.0.0.0/0')
-	group.authorize(ip_protocol='tcp', from_port=80, to_port=80, cidr_ip='0.0.0.0/0')
+	groups = conn.get_all_security_groups()
+	found = False
+	for group in groups: 
+		if group.name == "csc326-group5":
+			found = True 
+			break 
+	if found == False: 
+		group = conn.create_security_group("csc326-group5", "web search called inquest")
+		group.authorize(ip_protocol='icmp', from_port=-1, to_port=-1, cidr_ip='0.0.0.0/0')
+		group.authorize(ip_protocol='tcp', from_port=22, to_port=22, cidr_ip='0.0.0.0/0')
+		group.authorize(ip_protocol='tcp', from_port=80, to_port=80, cidr_ip='0.0.0.0/0')
 
 	resObj = conn.run_instances('ami-8caa1ce4', instance_type='t1.micro', security_groups=[group.name], key_name="keyPair0")
 	return  (conn, resObj)
@@ -66,7 +72,8 @@ def run():
 	wait_machine(my_ip.public_ip)
 	ip = copy(my_ip.public_ip, 'keyPair0.pem')
 	#return resObj, conn , ip
-	print ip
+	time.sleep(2)
+	print 'IP address = ' + ip + ' Instance Id ' + str(resObj.instances[0].id)
 	return ip
 
 def print_messages(stdout, stderr, stdin):
@@ -79,9 +86,6 @@ def copy(ip, key_file):
 	os.system('mkdir local_dir')
 	os.system('cp inquest.py local_dir/')
 	os.system('cp -r static local_dir/')
-	os.system('cp -r Beaker-1.6.4 local_dir/')
-	os.system('cp -r google-api-python-client local_dir/')
-	os.system('cp -r bottle-0.12.7 local_dir/')
 	os.system('cp client_secrets.json local_dir/')
 	os.system('cp keywords.db local_dir/')
 	scp_string = "scp -o StrictHostKeyChecking=no -i " + key_file + " -r local_dir " + remote_address
@@ -91,10 +95,19 @@ def copy(ip, key_file):
 	ssh_string_f = 'ssh -o StrictHostKeyChecking=no -f -i ' +  key_file  +  ' ' + my_machine 
 	ssh_string_nof = 'ssh -o StrictHostKeyChecking=no -i ' +  key_file  +  ' ' + my_machine 
 
-	os.system(ssh_string_nof +  ' \" cd ~/local_dir/Beaker-1.6.4; sudo apt-get install python-setuptools; python setup.py install --user \" ')
+	#Download dependencies 
+	os.system(ssh_string_nof + ' \" cd ~/local_dir; wget https://pypi.python.org/packages/source/b/bottle/bottle-0.12.7.tar.gz ; tar -zxvf bottle-0.12.7.tar.gz \"')
+	os.system(ssh_string_nof + ' \" cd ~/local_dir; sudo apt-get -y install git\"')
+	os.system(ssh_string_nof + ' \" cd ~/local_dir; git clone https://github.com/bbangert/beaker.git\"')
+	os.system(ssh_string_nof + ' \" cd ~/local_dir; git clone --recursive git://github.com/google/google-api-python-client.git \"')
+
+	#Install dependencies
+	os.system(ssh_string_nof +  ' \" cd ~/local_dir/beaker; sudo apt-get install python-setuptools; python setup.py install --user \" ')
 	os.system(ssh_string_nof +  ' \" cd local_dir/google-api-python-client; python setup.py install --user  \" ')
 	os.system(ssh_string_nof +  ' \" cd local_dir/bottle-0.12.7; python setup.py install --user  \"')
-	os.system(ssh_string_f +  ' \" cd local_dir; sudo python inquest.py  \"')
+
+	#Launch the search engine
+	os.system(ssh_string_f +  ' \" cd local_dir; sudo python inquest.py > /dev/null \"')
 
 	return ip
 

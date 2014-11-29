@@ -10,6 +10,7 @@ import beaker
 from beaker.middleware import SessionMiddleware 
 from bottle import route, get, post, request, run, static_file, error # or route
 import sqlite3 as lite
+import trie_implementation as trie
 
 session_opts = {
     'session.type': 'file',
@@ -32,6 +33,7 @@ curpage_dict = {}
 totalpage_dict = {}
 result_dict = {}
 NUM_LINKS_PER_PAGE = 10
+mytrie = {}
 #list_sessions = []
 
 global credentials 
@@ -152,6 +154,12 @@ def redirect_page():
     #logged_in = True
 
     return  searchForm + signoutbutton + "Welcome \"" + str_email + "\"" "</div>"+ createRecentTable() + "</body>"
+
+@get('/autocompelete')
+def autocomp(): 
+    in_put = request.query['input']
+    wordlist = trie.get_words_from_trie(mytrie, in_put)
+    print wordlist
 
 @get('/signout')
 def signout():
@@ -562,6 +570,22 @@ def createRecentTable ():
         s.save()
         return "" 
 
+def main():
+    global mytrie
+    con = lite.connect('keywords.db')
+    cur = con.cursor()
+    wordlist = []
+    cur.execute('SELECT word FROM lexicon')
+    word_set = cur.fetchall()
+    for i in word_set: 
+        clean_word = str(i[0])
+        wordlist.append(clean_word)
 
-run(app=app,host='localhost', port=8080, debug=True)
+    mytrie = trie.add_words_to_trie(wordlist)
+
+    run(app=app,host='localhost', port=8080, debug=True)
+
+if __name__ == '__main__':
+    main()
+
 

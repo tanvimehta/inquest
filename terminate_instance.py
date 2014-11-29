@@ -4,6 +4,8 @@ import boto.ec2 as ec2
 def terminate():
 	if len(sys.argv) < 3: 
 		print "Invalid Usage: try \"python terminate_instance.py <credentials> <instance_id_to_terminate> \" " 
+		return None
+		
 	instance_id = sys.argv[2]
 
 	d = {}
