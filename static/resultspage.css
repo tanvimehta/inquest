@@ -1,3 +1,6 @@
+			body {
+				width: 1500px;
+			}
 			table, th, td {
 	            font-family: sans-serif;
 	            border-collapse: collapse;
@@ -9,22 +12,6 @@
 	            margin-right: 0px;
 			}
 
-			form {
-				text-align: center;
-			}
-
-			h3 {
-				font-weight: bold;
-				text-align: center;
-				font-size: 30px;
-				color: #000000;
-			}
-
-			body {
-				width: 1000px;
-				font-family: sans-serif;
-				text-align: left;
-			}
 			button {
 				background: none !important ;
 				border: none!important ;
@@ -35,23 +22,152 @@
 				padding: 0!important ;
 				text-align: left;
 			}
+
 			button:hover span {
 				text-decoration: underline;
 			}
+
+			h3 {
+				color:#104E8B;
+				font-size: 40px;
+				padding-top: 0px;
+				margin-top: 15px;
+				float: left; 
+			}
+
 			img {
+				margin-top: 16px;
 				width: 50px;
 				height: 50px;
 				float: left;
-				padding-left: 20px;
 			}
 
-			h1 {
-				font-weight: bold;
-				text-align: left;
-				font-size: 50px;
-				padding-left: 100px;
+			input[type="text"] {
+				padding-top: 0px;
+				margin-left: 20px;
+				margin-top: 26px;
+				border-style: solid;
+				border-color: #777777; 
+				border-width: 1px;
+				width: 500px;
+				height: 25px;
+				font-size: 20px;
+				font-family: sans-serif;
+			}
+
+			input[type="submit"] {
+				background-color: #104E8B;
+				color: white;
+				padding-top: 4px;
+				margin-top: 0px;
+				width: 70px;
+				height: 25px;
+				border-top: 0px;
+				font-size: 15px;
+				cursor:pointer;
+			}
+
+			#searchButton {
+				background-color: #104E8B;
+				color: white;
+				padding-top: 4px;
+				margin-top: 0px;
+				width: 80px;
+				height: 25px;
+				border-top: 0px;
+				font-size: 15px;
+			}
+
+			#whole {
+				background-color: #F1F1F1;
+				padding: 0px;
+				margin: 0px;
+				border: 0px;
+				height: 70px;
+			}
+
+			h5 {
+				position: fixed;
+				top: 15px;
+				left: 750px;
+			}
+
+			#so {
+				width: 5px;
+				float: right;
+				position: fixed;
+				top: 18px;
+				left: 1000px;	
+			}
+
+			#back {
+				background-color: #F1F1F1;
 				color: #104E8B;
+				font-family: sans-serif;
+				font-weight: 900;
+				border: 0px;
+				float: left;
+				padding-top: 4px;
+				margin-top: 18px;
+				width: 80px;
+				height: 40px;
+				font-size: 21px;
 			}
 
+			.entry {
+				width: 50%;
+			}
 
+			.entrytitle {
+				font-size: 20px;
+				color: #1A0DB0;
+				font-weight: bold;
+				margin-bottom: 0px;
+			}
 
+			.entryurl {
+				margin-bottom: 8px;
+				color: #006621;
+				font-weight: bolder;
+			}
+
+			.entrycontents {
+				font-size: 15px;
+				color: #545454;
+			}
+
+			#pageNum {
+				background-color: white; 
+				padding-top: 11px;
+				margin-right: 5px;
+				margin-left: 5px;
+				padding-left: 5px;
+				padding-right: 5px;
+				width: 27px;
+				border: 0px;
+				color: #1A0DB0;
+				font-size: 15px;
+			}
+			#curr {
+				font-size: 15px;
+				font-weight: bold;
+				padding: 0px;
+				margin: 0px;
+
+			}
+
+			#next {
+				padding-top: 10px;
+				font-weight: bolder;
+				background-color: white;
+				border: 0px;
+				color: #1A0DB0;
+			}
+
+			#prev {
+				padding-top: 10px;
+				font-weight: bolder;
+				background-color: white;
+				border: 0px;
+				color: #1A0DB0;
+			}

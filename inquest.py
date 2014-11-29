@@ -1,4 +1,3 @@
-
 from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.client import flow_from_clientsecrets
 from googleapiclient.errors import HttpError
@@ -37,12 +36,12 @@ NUM_LINKS_PER_PAGE = 10
 
 global credentials 
 
-searchButton = """ <form action = "/results" method = "get" id = "query">
+searchButton = """<form action = "/results" method = "get" id = "query">
                     <p><span class = "textbox"><input type = "text" name = "keywords" id = "keywords"/></span></p>
                     <p><input type = "submit" name = "search" value = "Search"/>
                    </form>"""
 
-loginForm = """<head> <link rel="stylesheet" type="text/css" href="/static/inquest.css"></head>
+loginForm = """<head> <link rel="stylesheet" type="text/css" href="/static/inquest.css"><link rel="shortcut icon" href="static/favicon.ico"></head>
         <body>
         <div id = "page">
             <div id="titlebar">
@@ -56,7 +55,7 @@ loginForm = """<head> <link rel="stylesheet" type="text/css" href="/static/inque
                     <p><input type = "submit" name = "guest" value = "Guest"/>
             </form>"""
 
-searchForm = """<head> <link rel="stylesheet" type="text/css" href="/static/inquest.css"></head>
+searchForm = """<head> <link rel="stylesheet" type="text/css" href="/static/inquest.css"><link rel="shortcut icon" href="static/favicon.ico"></head>
         <body>
         <div id = "page">
             <div id="titlebar">
@@ -72,22 +71,22 @@ signoutbutton = """
 
 guestbackbutton = """
     <form action = "/guest" method = "get" id = "guestbackbutton">
-            <p><input type = "submit" name = "Back" value = "Back"/>
+            <p><input id = "back" type = "submit" name = "Back" value = "Inquest"/>
     </form>"""
 
 logged_inbackbutton = """
     <form action = "/logged_in" method = "get" id = "loginbackbutton">
-            <p><input type = "submit" name = "Back" value = "Back"/>
+            <p><input id = "back" type = "submit" name = "Back" value = "Inquest"/>
     </form>"""
 
 prev_page_button = """
     <form action = "/prev_page" method = "get" id = "prev_page_button">
-            <p><input type = "submit" name = "Prev Page" value = "Prev Page"/>
+            <p><input id = "prev" type = "submit" name = "Prev Page" value = "Prev"/>
     </form>"""
 
 next_page_button = """
     <form action = "/next_page" method = "get" id = "next_page_button">
-            <p><input type = "submit" name = "Next Page" value = "Next Page"/>
+            <p><input id = "next" type = "submit" name = "Next Page" value = "Next"/>
     </form>"""
 
 home_button = """
@@ -97,18 +96,18 @@ home_button = """
 
 def create_page_link_btn(page_num):
     return """<form action = "/get_page_num" method = "get">
-            <button><input type = "submit" name = "page_num" value = " """ + str(page_num) +  """ "/>
+            <button><input id = "pageNum" type = "submit" name = "page_num" value = " """ + str(page_num) +  """ "/>
     </form>"""
 
 @error(404)
 def error404(error):
     no_page = "<h3> Nothing on this page </h3>"
-    return """<head><link rel="stylesheet" type="text/css" href="/static/errorpage.css"></head><body>""" + no_page + home_button + "</body>"
+    return """<head><link rel="stylesheet" type="text/css" href="/static/errorpage.css"><link rel="shortcut icon" href="static/favicon.ico"></head><body>""" + no_page + home_button + "</body>"
 
 @error(501)
 def error404(error):
     no_page = "<h3> This Method is not supported </h3>"
-    return """<head><link rel="stylesheet" type="text/css" href="/static/errorpage.css"></head><body>""" + no_page + home_button + "</body>"
+    return """<head><link rel="stylesheet" type="text/css" href="/static/errorpage.css"><link rel="shortcut icon" href="static/favicon.ico"></head><body>""" + no_page + home_button + "</body>"
 
 @route('/static/<filename>') 
 def server_static(filename):
@@ -288,26 +287,41 @@ def print_result_page(query, curr_email, logged_in, results, curr_page):
     if curr_page > 0: 
         ppb = prev_page_button
 
+    # Results Page!!!!!!
+    resultsPage = """<div id = 'whole'><img src="/static/search.jpg" alt="Inquest Logo"><span id = 'whole'>""" + back + """<form action = "/results" method = "get" id = "query">
+    <input type = "text" value = """ + query + """ name = "keywords" id = "keywords">
+    <input id = "searchButton" type = "submit" name = "search" value = "Search"/></form><h5>Hello """ + curr_email + """!</h5></span></div><div id="so">""" + sobutton + """</div>"""
 
-    resultsPage = "<h3>Search for \"" + query  + "\" " + curr_email + sobutton + searchButton + back + "</h3><br> Links <br>" 
+    #+ curr_email + sobutton + back
     for i in range(0,to_print):
         title = results[starting_pt + i][3] 
         url = results[starting_pt + i][2]
+        description = results[starting_pt + i][4]
         if title == 'None':
             title = 'No Title'
         title = eval(title)
-        resultsPage = resultsPage + "<br><tr><td>" + title + " <a href = " + url+ ">" + url  + "</a></td></tr><br>"
 
+        if description == 'None':
+            description = 'No Title'
+
+        resultsPage = resultsPage + """<div class="entry">
+        <div class="entryheading">
+        <a href = """ + url + """><h2 class="entrytitle">""" + title + """</h2></a>
+        <div class="entryurl">""" + url + """</div>
+        </div>
+        <div class="entrycontents">""" + description + """</div></div>"""
+
+    # Pagination
     if total_page > 0:
         resultsPage = resultsPage + "<br><br><table id = pagination><tr><td> " + ppb + "</td>"
         for i in range(0,total_page+1):
             if i == curr_page:
-                resultsPage = resultsPage + "<td>" + str(i+1) + "</td>"
+                resultsPage = resultsPage + """<td id="curr">""" + str(i+1) + "</td>"
             else:
                 resultsPage = resultsPage + "<td>" + create_page_link_btn(i+1) + "</td>" 
         resultsPage = resultsPage + "<td> " + npb + "</td></tr>"
 
-    return """<head><link rel="stylesheet" type="text/css" href="/static/resultspage.css"></head><body>""" + resultsPage + "</body>" 
+    return """<head><link rel="stylesheet" type="text/css" href="/static/resultspage.css"><link rel="shortcut icon" href="static/favicon.ico"></head><body>""" + resultsPage + "</body>" 
 
 @get('/results')
 def do_inquest() :
@@ -348,6 +362,11 @@ def do_inquest() :
         s.save()
         return searchForm + "<p>Please enter a search query .</p></div>" + createRecentTable()  + "</body>"
     else: 
+        
+        value = mathOperations(words);
+        if value != "":
+            return searchForm + "<p>" + value + "</p></div>" + createRecentTable()  + "</body>"
+
         searched = words[0]
         con = lite.connect('keywords.db')
         cur = con.cursor()
@@ -364,11 +383,12 @@ def do_inquest() :
                 cur.execute('SELECT rank FROM page_rank WHERE doc_id = ?',(doc_id_r,))
                 rank_set = cur.fetchone()
                 rank = rank_set[0]
-                cur.execute('SELECT url, title FROM document_index WHERE doc_id = ?',(doc_id_r,))
+                cur.execute('SELECT url, title, description FROM document_index WHERE doc_id = ?',(doc_id_r,))
                 url_set = cur.fetchone()
                 url = url_set[0]
                 title = url_set[1]
-                result.append((doc_id_r, rank, url, title))
+                description = url_set[2]
+                result.append((doc_id_r, rank, url, title, description))
             result.sort(key=lambda x: x[1], reverse = True)
             s['results'] = result
             s['curr_page'] = 0
@@ -406,7 +426,83 @@ def do_inquest() :
             s.save()
             return searchForm + "<p>No Match Found. Please try other keywords.</p></div>" + createRecentTable() + "</body>"
 
-   
+def mathOperations(words):
+    i = 0
+    isCalc = True
+    calcList = []
+    while i < len(words):
+        if isint(words[i]):
+            calcList = calcList + [int(words[i])]
+        elif isfloat(words[i]):
+            calcList = calcList + [float(words[i])]
+        else:
+            isCalc = False
+            break
+        if i+1 < (len(words) - 1):
+            if is_operator(words[i+1]):
+                calcList = calcList + [words[i+1]]
+            else:
+                isCalc = False
+                break
+        i += 2
+
+    i = 1
+    if isCalc is False:
+        return ""
+    else:
+        try:
+            value = calcList[0]
+            while i < (len(calcList) - 1):
+                if calcList[i] == "+":
+                    value = value + calcList[i+1]
+                elif calcList[i] == "-":
+                    value = value - calcList[i+1]
+                elif calcList[i] == "*":
+                    value = value * calcList[i+1]
+                elif calcList[i] == "/":
+                    value = value / calcList[i+1]
+                elif calcList[i] == "%":
+                    value = value % calcList[i+1]
+                elif calcList[i] == "^":
+                    value = value ** calcList[i+1]
+                i += 2
+        except ValueError:
+            return ""
+        except TypeError:
+            return ""
+        except ZeroDivisionError:
+            return ""
+        else: 
+            return str(value)
+
+def isfloat(x):
+    try:
+        a = float(x)
+    except ValueError:
+        return False
+    else:
+        return True
+
+def isint(x):
+    try:
+        a = int(x)
+    except ValueError:
+        return False
+    else:
+        return True
+
+def is_operator(s):
+    if s == "+" or s == "-" or s == "/" or s == "*" or s == "^" or s == "%":
+        return True
+
+    return False
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 def updateWordList (wordList, word, count):
     tmpList = []
@@ -467,5 +563,5 @@ def createRecentTable ():
         return "" 
 
 
-run(app=app,host='0.0.0.0', port=80, debug=True)
+run(app=app,host='localhost', port=8080, debug=True)
 
