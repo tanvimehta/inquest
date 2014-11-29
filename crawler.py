@@ -36,6 +36,7 @@ def attr(elem, attr):
         return ""
 
 WORD_SEPARATORS = re.compile(r'\s|\n|\r|\t|[^a-zA-Z0-9\-_]')
+DESC_WORDS = 50
 
 class crawler(object):
     """Represents 'Googlebot'. Populates a database by crawling and indexing
@@ -59,6 +60,8 @@ class crawler(object):
         self._links = [ ]
         self._links_dict = { }
         self._next_link_id = 1
+        self._descriptions = { }
+        self._inv_word_id_cache = { }
         self._page_rank = defaultdict(lambda: float(initial_pr))
 
         # functions to call when entering and exiting specific tags
@@ -124,6 +127,9 @@ class crawler(object):
         self._font_size = 0
         self._curr_words = None
         self._curr_title = ""
+        self._cur_desc = ""
+        self._open_para = False
+        self._cur_desc_word = 0
 
         # get all urls into the queue
         try:
@@ -161,6 +167,7 @@ class crawler(object):
 
         word_id = self._mock_insert_word(word)
         self._word_id_cache[word] = word_id
+        self._inv_word_id_cache[word_id] = word
         return word_id
     
     def document_id(self, url):
@@ -228,6 +235,7 @@ class crawler(object):
         #       database for this document
         self._doc_id_word_list[self._curr_doc_id] = self._curr_words
         self._doc_id_url[self._curr_doc_id] = self._curr_url
+
         print "    num words="+ str(len(self._curr_words))
 
     def _increase_font_factor(self, factor):
@@ -244,8 +252,17 @@ class crawler(object):
         """Add some text to the document. This records word ids and word font sizes
         into the self._curr_words list for later processing."""
         words = WORD_SEPARATORS.split(elem.string.lower())
+        global DESC_WORDS
         for word in words:
             word = word.strip()
+
+            if (self._open_para == True) and (self._cur_desc_word < DESC_WORDS):
+                self._cur_desc = self._cur_desc + " " + word
+                self._cur_desc_word = self._cur_desc_word + 1
+            if (self._cur_desc_word >= DESC_WORDS):
+                self._cur_desc_word = 0
+                self._open_para = False  
+
             if word in self._ignored_words:
                 continue
             self._lexicon.append(word)
@@ -253,7 +270,8 @@ class crawler(object):
             if not self._inverted_index.has_key(wordid):          
                 self._inverted_index[wordid] = set()
             self._inverted_index[wordid].add(self._curr_doc_id)
-            self._word_index[wordid] = word            
+            self._word_index[wordid] = word
+                
             self._curr_words.append((self.word_id(word), self._font_size))
         
     def _text_of(self, elem):
@@ -292,27 +310,10 @@ class crawler(object):
                     self._exit[stack[-1].name.lower()](stack[-1])
                     stack.pop()
 
-                tag_name = tag.name.lower()
+                tag_name = tag.name.lower()  
 
-                # if tag_name == 'a':
-                #     curr_link_id = 0 
-                #     new_link_id = 0
-                #     if self._curr_url in self._links_dict: 
-                #         curr_link_id = self._links_dict[self._curr_url]
-                #     else: 
-                #         curr_link_id = self._next_link_id
-                #         self._links_dict[self._curr_url] = self._next_link_id 
-                #         self._next_link_id = self._next_link_id+1
-
-                #     new_link = tag.get('href')
-
-                #     if new_link in self._links_dict: 
-                #         new_link_id = self._links_dict[new_link]
-                #     else: 
-                #         new_link_id = self._next_link_id
-                #         self._links_dict[new_link] = self._next_link_id 
-                #         self._next_link_id = self._next_link_id+1
-                #     self._links.append((curr_link_id, new_link_id))
+                if tag_name == 'p':
+                    self._open_para = True
 
                 if tag_name in self._ignored_tags:
                     if tag.nextSibling:
@@ -365,6 +366,8 @@ class crawler(object):
                 self._index_document(soup)
                 self._add_words_to_document()
                 self._document_index[doc_id] = repr(self._curr_title)
+                self._descriptions[doc_id] = self._cur_desc 
+                self._cur_desc = ""
                 print "    url="+repr(self._curr_url)
 
             except Exception as e:
@@ -422,12 +425,15 @@ class crawler(object):
             cur.execute('INSERT OR IGNORE INTO page_rank VALUES (?,?)', (doc_id, rank))
 
         # Crate document_index in database
-        cur.execute('CREATE TABLE IF NOT EXISTS document_index(doc_id INTEGER PRIMARY KEY, url TEXT, title TEXT);')
+        cur.execute('CREATE TABLE IF NOT EXISTS document_index(doc_id INTEGER PRIMARY KEY, url TEXT, title TEXT, description TEXT);')
         for url, doc_id in self._doc_id_cache.iteritems(): 
             title = 'None'
+            desc = 'None'
             if doc_id in self._document_index: 
                 title = self._document_index[doc_id]
-            cur.execute('INSERT OR IGNORE INTO document_index VALUES (?, ?, ?)',(doc_id, url, title))
+            if doc_id in self._descriptions: 
+                desc = self._descriptions[doc_id]
+            cur.execute('INSERT OR IGNORE INTO document_index VALUES (?, ?, ?, ?)',(doc_id, url, title, desc))
 
         # Create inverted index in database
         cur.execute('CREATE TABLE IF NOT EXISTS inverted_index(word_id INTEGER PRIMARY KEY, doc_id_set TEXT);')
@@ -467,8 +473,9 @@ class crawler(object):
 
         cur.execute('SELECT * FROM document_index')
         inv_doc_id_cache = cur.fetchall()
-        self._doc_id_cache = dict((v,k) for (k,v,l) in inv_doc_id_cache)
-        self._document_index = dict((k,l) for (k,v,l) in inv_doc_id_cache)
+        self._doc_id_cache = dict((v,k) for (k,v,l, m) in inv_doc_id_cache)
+        self._document_index = dict((k,l) for (k,v,l, m) in inv_doc_id_cache)
+        self._descriptions = dict((k,m) for (k,v,l, m) in inv_doc_id_cache)
 
         cur.execute('SELECT * FROM inverted_index')
         ii_cache= cur.fetchall()
