@@ -36,7 +36,7 @@ def attr(elem, attr):
         return ""
 
 WORD_SEPARATORS = re.compile(r'\s|\n|\r|\t|[^a-zA-Z0-9\-_]')
-DESC_WORDS = 50
+DESC_WORDS = 20
 
 class crawler(object):
     """Represents 'Googlebot'. Populates a database by crawling and indexing
@@ -251,7 +251,8 @@ class crawler(object):
     def _add_text(self, elem):
         """Add some text to the document. This records word ids and word font sizes
         into the self._curr_words list for later processing."""
-        words = WORD_SEPARATORS.split(elem.string.lower())
+        #words = WORD_SEPARATORS.split(elem.string.lower())
+        words = WORD_SEPARATORS.split(elem.string)
         global DESC_WORDS
         for word in words:
             word = word.strip()
@@ -263,6 +264,7 @@ class crawler(object):
                 self._cur_desc_word = 0
                 self._open_para = False  
 
+            word = word.lower()
             if word in self._ignored_words:
                 continue
             self._lexicon.append(word)
