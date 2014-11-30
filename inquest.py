@@ -310,7 +310,10 @@ def print_result_page(query, curr_email, logged_in, results, curr_page):
         title = eval(title)
 
         if description == 'None':
-            description = 'No Title'
+            description = 'No description'
+
+        if len(description) > 250: 
+            description = description[:250] + ' ...'
 
         resultsPage = resultsPage + """<div class="entry">
         <div class="entryheading">
@@ -333,15 +336,17 @@ def print_result_page(query, curr_email, logged_in, results, curr_page):
 
 @get('/results')
 def do_inquest() :
-    NUM_LINKS_PER_PAGE
+    global NUM_LINKS_PER_PAGE
     global wordlistdict
     global recent_list_dict
+
     s = bottle.request.environ.get('beaker.session')
     wordList = []
     recent_list = []
     curr_email = ""
     logged_in = False
     
+    # check if logged in or not 
     if 'user' in s:
         curr_email = s['user']
         logged_in = True
@@ -353,6 +358,7 @@ def do_inquest() :
         print i, request.query[i]
     words = query.split()
 
+    #if logged in create a history table
     if logged_in:
         reverse_words = words[:]
         reverse_words.reverse()
@@ -366,6 +372,7 @@ def do_inquest() :
         recent_list_dict[curr_email] = recent_list
 
 
+    #if no input, print error message
     if len(words) == 0:
         s.save()
         return searchForm + "<p>Please enter a search query .</p></div>" + createRecentTable()  + "</body>"

@@ -257,12 +257,13 @@ class crawler(object):
         for word in words:
             word = word.strip()
 
-            if (self._open_para == True) and (self._cur_desc_word < DESC_WORDS):
-                self._cur_desc = self._cur_desc + " " + word
-                self._cur_desc_word = self._cur_desc_word + 1
-            if (self._cur_desc_word >= DESC_WORDS):
-                self._cur_desc_word = 0
-                self._open_para = False  
+            if (self._open_para == True): 
+                if (self._cur_desc_word < DESC_WORDS):
+                    self._cur_desc = self._cur_desc + " " + word
+                    self._cur_desc_word = self._cur_desc_word + 1
+                else:
+                    self._cur_desc_word = 0
+                    self._open_para = False  
 
             word = word.lower()
             if word in self._ignored_words:
@@ -369,7 +370,8 @@ class crawler(object):
                 self._add_words_to_document()
                 self._document_index[doc_id] = repr(self._curr_title)
                 self._descriptions[doc_id] = self._cur_desc 
-                self._cur_desc = ""
+                self._cur_desc = " "
+                self._open_para = False
                 print "    url="+repr(self._curr_url)
 
             except Exception as e:
