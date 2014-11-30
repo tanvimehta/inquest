@@ -117,7 +117,7 @@
 			}
 
 			.blank_space{ 
-				padding-top: 60px;
+				padding-top: 85px;
 			}
 
 			.entry {
@@ -180,6 +180,7 @@
 
 			#dropdown {
 				float: left;
+				font-size: 15px;
 				margin-left: 150px;
 				clear: right;
 				width: 200px;

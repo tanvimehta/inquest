@@ -52,11 +52,10 @@ function getUserQuery(wholeQuery) {
 }
 
 function showOptions(wordList, evt, query) {
-  document.getElementById("dropdown").style.visibility = "visible";
   document.getElementById("dropdown").innerHTML = "";
   for (i = 1; i < numSuggestions; i++) {
     if (wordList[i] != undefined) {
-      document.getElementById("dropdown").size = i + 1;
+      document.getElementById("dropdown").size = i;
       if (i <= parseInt(wordList[0]))
         document.getElementById("dropdown").innerHTML = document.getElementById("dropdown").innerHTML + "<option style=\"color:#52188C;font-weight:bolder\" value=\"word" + i + "\">" + wordList[i] + "</option>";
       else
@@ -65,6 +64,7 @@ function showOptions(wordList, evt, query) {
     }
     else
       break;
+    document.getElementById("dropdown").style.visibility = "visible";
   }
 
   var key = evt.keyCode || evt.charCode;
