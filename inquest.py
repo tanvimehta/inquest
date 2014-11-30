@@ -150,8 +150,6 @@ def redirect_page():
 
     s['user'] = str_email
     s.save()
-    #curr_email = str_email
-    #logged_in = True
 
     return  searchForm  +"""<div class = "sobutton"> Welcome " """ + str_email + "\"" + signoutbutton +  "</div></div>"+ createRecentTable() + "</body>"
 

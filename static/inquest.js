@@ -1,11 +1,11 @@
 var numSuggestions = 5;
 function autoComp() {
 	var words = [];
-  var url = "";
+  var url = window.location.origin;
   document.getElementById("dropdown").innerHTML = "";
   document.getElementById("dropdown").style.visibility = "hidden";
     if (document.getElementById("keywords").value != "") {
-      url = "http://ec2-54-172-218-21.compute-1.amazonaws.com/autocomplete?input=" + document.getElementById("keywords").value;
+      url = url + "/autocomplete?input="+ document.getElementById("keywords").value;
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange=function()
         {
