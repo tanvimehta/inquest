@@ -116,6 +116,10 @@
 				font-size: 21px;
 			}
 
+			.blank_space{ 
+				padding-top: 60px;
+			}
+
 			.entry {
 				width: 50%;
 			}
@@ -176,7 +180,7 @@
 
 			#dropdown {
 				float: left;
-				margin-left: 180px;
+				margin-left: 150px;
 				clear: right;
 				width: 200px;
 				padding-top: 0px;

@@ -153,7 +153,7 @@ def redirect_page():
     #curr_email = str_email
     #logged_in = True
 
-    return  searchForm + signoutbutton + "Welcome \"" + str_email + "\"" "</div>"+ createRecentTable() + "</body>"
+    return  searchForm  + signoutbutton + "Welcome \"" + str_email + "\"" "</div></div>"+ createRecentTable() + "</body>"
 
 @get('/autocomplete')
 def autocomp(): 
@@ -310,9 +310,11 @@ def print_result_page(query, curr_email, logged_in, results, curr_page):
 
     # Results Page!!!!!!
     resultsPage = """<div id = 'whole'><img src="/static/search.jpg" alt="Inquest Logo"><span id = 'whole'>""" + back + """<form autocomplete="off" action = "/results" method = "get" id = "query">
-    <input oninput = "autoComp()" type = "text" value = """ + query + """ name = "keywords" id = "keywords"><p><select onchange="applySelect()" size = 5 id = "dropdown"></select></p>
-    <input id = "searchButton" type = "submit" name = "search" value = "Search"/></form><h5>Hello """ + curr_email + """!</h5></span></div><div id="so">""" + sobutton + """</div>"""
+    <input oninput = "autoComp()" type = "text" value = """ + query + """ name = "keywords" id = "keywords">
+    <input id = "searchButton" type = "submit" name = "search" value = "Search"/></form><h5>Hello """ + curr_email + """!</h5></span></div>
+    <div id="so">""" + sobutton + """</div><p><select onchange="applySelect()" size = 5 id = "dropdown"></select></p>""" 
 
+    resultsPage = resultsPage + """<div class="blank_space" ><p></p> </div> """
     #+ curr_email + sobutton + back
     for i in range(0,to_print):
         title = results[starting_pt + i][3] 
