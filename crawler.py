@@ -506,6 +506,8 @@ class crawler(object):
 
 
 if __name__ == "__main__":
-    bot = crawler(None, "urls.txt")
-    bot.crawl(depth=1)
+    bot = crawler(None, "urls2.txt")
+    bot.crawl(depth=2)
+    bot.get_page_rank()
+    bot.write_to_database()
 
