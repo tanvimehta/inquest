@@ -64,7 +64,8 @@
 
 			#dropdown {
 				float: left;
-				margin-left: 180px;
+				clear: both;
+				margin-left: 174px;
 				clear: right;
 				width: 200px;
 				padding-top: 0px;

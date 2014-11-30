@@ -27,7 +27,7 @@ function autoComp() {
 function showOptions(wordList) {
   document.getElementById("dropdown").style.visibility = "visible";
   for (i = 0; i < numSuggestions; i++) {
-    if (wordList[i] != null)
+    if (wordList[i] != undefined)
       document.getElementById("dropdown").innerHTML = document.getElementById("dropdown").innerHTML + "<option value=\"word" + i + "\">" + wordList[i] + "</option>";
     else
       break;

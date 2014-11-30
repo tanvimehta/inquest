@@ -39,8 +39,8 @@ mytrie = {}
 global credentials 
 
 searchButton = """<form autocomplete="off" action = "/results" method = "get" id = "query">
-                    <p><span class = "textbox"><input oninput="autoComp()" type = "text" name = "keywords" id = "keywords"/><input type = "submit" name = "search" value = "Search"/></span></p>
-                    <p><select size = 5 id="dropdown" onchange="applySelect()"></select></p>
+                    <span class = "textbox"><input oninput="autoComp()" type = "text" name = "keywords" id = "keywords"/><input type = "submit" name = "search" value = "Search"/></span>
+                    <select size = 5 id="dropdown" onchange="applySelect()"></select>
                    </form>"""
 
 loginForm = """<head><script type="text/javascript" src="/static/inquest.js"></script><link rel="stylesheet" type="text/css" href="/static/inquest.css"><link rel="shortcut icon" href="static/favicon.ico"></head>
@@ -67,9 +67,9 @@ searchForm = """<head> <script type="text/javascript" src="/static/inquest.js"><
             """ + searchButton
 
 signoutbutton = """
-    <form action = "/signout" method = "get" id = "signout">
+    <p><form action = "/signout" method = "get" id = "signout">
             <p><input type = "submit" name = "signout" value = "Signout"/>
-    </form>"""
+    </form></p>"""
 
 guestbackbutton = """
     <form action = "/guest" method = "get" id = "guestbackbutton">
