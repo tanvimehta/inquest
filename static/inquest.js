@@ -5,7 +5,7 @@ function autoComp() {
   document.getElementById("dropdown").innerHTML = "";
   document.getElementById("dropdown").style.visibility = "hidden";
     if (document.getElementById("keywords").value != "") {
-      url = "http://localhost:8080/autocomplete?input=" + document.getElementById("keywords").value;
+      url = "http://ec2-54-172-218-21.compute-1.amazonaws.com/autocomplete?input=" + document.getElementById("keywords").value;
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange=function()
         {

@@ -67,9 +67,9 @@ searchForm = """<head> <script type="text/javascript" src="/static/inquest.js"><
             """ + searchButton
 
 signoutbutton = """
-    <p><form action = "/signout" method = "get" id = "signout">
-            <p><input type = "submit" name = "signout" value = "Signout"/>
-    </form></p>"""
+    <form action = "/signout" method = "get" id = "signout">
+            <input type = "submit" name = "signout" value = "Signout"/>
+    </form>"""
 
 guestbackbutton = """
     <form action = "/guest" method = "get" id = "guestbackbutton">
@@ -153,7 +153,7 @@ def redirect_page():
     #curr_email = str_email
     #logged_in = True
 
-    return  searchForm  + signoutbutton + "Welcome \"" + str_email + "\"" "</div></div>"+ createRecentTable() + "</body>"
+    return  searchForm  +"""<div class = "sobutton"> Welcome " """ + str_email + "\"" + signoutbutton +  "</div></div>"+ createRecentTable() + "</body>"
 
 @get('/autocomplete')
 def autocomp(): 
@@ -200,7 +200,7 @@ def inquest() :
         sobutton = signoutbutton
     else: 
         email = "Guest"
-    return searchForm + sobutton + "Welcome \"" + email + "\"" "</div>"+ createRecentTable() + "</body>"
+    return searchForm +  """<div class = "sobutton">""" + "Welcome \"" + email + "\"" +  sobutton + "</div></div>"+ createRecentTable() + "</body>"
 
 @get('/guest')
 def guest():
@@ -603,7 +603,7 @@ def main():
 
     mytrie = trie.add_words_to_trie(wordlist)
 
-    run(app=app,host='localhost', port=8080, debug=True)
+    run(app=app,host='0.0.0.0', port=80, debug=True)
 
 if __name__ == '__main__':
     main()

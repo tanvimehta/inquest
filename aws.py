@@ -88,6 +88,7 @@ def copy(ip, key_file):
 	os.system('cp -r static local_dir/')
 	os.system('cp client_secrets.json local_dir/')
 	os.system('cp keywords.db local_dir/')
+	os.system('cp trie_implementation.py local_dir/')
 	scp_string = "scp -o StrictHostKeyChecking=no -i " + key_file + " -r local_dir " + remote_address
 	os.system(scp_string)
 	os.system("rm -rf local_dir")
