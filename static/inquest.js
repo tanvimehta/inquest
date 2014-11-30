@@ -58,7 +58,7 @@ function showOptions(wordList, evt, query) {
     if (wordList[i] != undefined) {
       document.getElementById("dropdown").size = i + 1;
       if (i <= parseInt(wordList[0]))
-        document.getElementById("dropdown").innerHTML = document.getElementById("dropdown").innerHTML + "<option style=\"color:#52188C;\" value=\"word" + i + "\">" + wordList[i] + "</option>";
+        document.getElementById("dropdown").innerHTML = document.getElementById("dropdown").innerHTML + "<option style=\"color:#52188C;font-weight:bolder\" value=\"word" + i + "\">" + wordList[i] + "</option>";
       else
         document.getElementById("dropdown").innerHTML = document.getElementById("dropdown").innerHTML + "<option value=\"word" + i + "\">" + wordList[i] + "</option>";
 
@@ -70,9 +70,9 @@ function showOptions(wordList, evt, query) {
   var key = evt.keyCode || evt.charCode;
 
     if( key > 48 && key < 90 ) {
-    if (wordList[0] != undefined) {
+    if (wordList[1] != undefined) {
       currentValue = query;
-      newValue = wordList[0];
+      newValue = wordList[1];
       start = currentValue.length;
       end = newValue.length;
       document.getElementById("keywords").value = newValue;
