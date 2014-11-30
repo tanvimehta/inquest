@@ -1,6 +1,4 @@
-
 from collections import defaultdict
-wordlist = []
 
 def add_words_to_trie(words):
 	trie = dict()
@@ -11,12 +9,11 @@ def add_words_to_trie(words):
 		curdict = curdict.setdefault('_end_', '_end_')
 	return trie
 
-def recursive_get_word(trie, prefix):
-	global wordlist
+def recursive_get_word(trie, prefix, wordlist):
 
 	for (k,v) in trie.iteritems():
 		if isinstance(v,dict):
-			recursive_get_word(v, prefix + k)
+			recursive_get_word(v, prefix + k, wordlist)
 		if v == '_end_':
 			wordlist.append(prefix)
 			
@@ -24,13 +21,14 @@ def recursive_get_word(trie, prefix):
 def get_words_from_trie(trie, prefix):
 	current_dict = trie
 	word = ''
+	wordlist = []
 	for letter in prefix:
 		if letter in current_dict:
 			current_dict = current_dict[letter]
 		else:
 			return False
 	else:
-		recursive_get_word(current_dict, prefix)
+		recursive_get_word(current_dict, prefix, wordlist)
 	return wordlist
 		
 

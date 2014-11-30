@@ -53,6 +53,8 @@
 				height: 25px;
 				font-size: 20px;
 				font-family: sans-serif;
+				margin-bottom: 0px;
+				padding-bottom: 0px;
 			}
 
 			input[type="submit"] {
@@ -170,4 +172,13 @@
 				background-color: white;
 				border: 0px;
 				color: #1A0DB0;
+			}
+
+			#dropdown {
+				float: left;
+				width: 500px;
+				padding-top: 0px;
+				margin-top: 0px;
+				size: 5;
+				visibility: hidden;
 			}

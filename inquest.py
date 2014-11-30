@@ -39,11 +39,11 @@ mytrie = {}
 global credentials 
 
 searchButton = """<form action = "/results" method = "get" id = "query">
-                    <p><span class = "textbox"><input type = "text" name = "keywords" id = "keywords"/></span></p>
-                    <p><input type = "submit" name = "search" value = "Search"/>
+                    <p><span class = "textbox"><input oninput="autoComp()" type = "text" name = "keywords" id = "keywords"/><input type = "submit" name = "search" value = "Search"/></span></p>
+                    <p><select size = 5 id="dropdown" onchange="applySelect()"></select></p>
                    </form>"""
 
-loginForm = """<head> <link rel="stylesheet" type="text/css" href="/static/inquest.css"><link rel="shortcut icon" href="static/favicon.ico"></head>
+loginForm = """<head><script type="text/javascript" src="/static/inquest.js"></script><link rel="stylesheet" type="text/css" href="/static/inquest.css"><link rel="shortcut icon" href="static/favicon.ico"></head>
         <body>
         <div id = "page">
             <div id="titlebar">
@@ -57,7 +57,7 @@ loginForm = """<head> <link rel="stylesheet" type="text/css" href="/static/inque
                     <p><input type = "submit" name = "guest" value = "Guest"/>
             </form>"""
 
-searchForm = """<head> <link rel="stylesheet" type="text/css" href="/static/inquest.css"><link rel="shortcut icon" href="static/favicon.ico"></head>
+searchForm = """<head> <script type="text/javascript" src="/static/inquest.js"></script><link rel="stylesheet" type="text/css" href="/static/inquest.css"><link rel="shortcut icon" href="static/favicon.ico"></head>
         <body>
         <div id = "page">
             <div id="titlebar">
@@ -155,11 +155,11 @@ def redirect_page():
 
     return  searchForm + signoutbutton + "Welcome \"" + str_email + "\"" "</div>"+ createRecentTable() + "</body>"
 
-@get('/autocompelete')
+@get('/autocomplete')
 def autocomp(): 
     in_put = request.query['input']
-    wordlist = trie.get_words_from_trie(mytrie, in_put)
-    print wordlist
+    wordList = trie.get_words_from_trie(mytrie, in_put)
+    return wordList[0] + ";" + wordList[1] + ";" + wordList[2] + ";" + wordList[3] + ";" + wordList[4]
 
 @get('/signout')
 def signout():
@@ -297,7 +297,7 @@ def print_result_page(query, curr_email, logged_in, results, curr_page):
 
     # Results Page!!!!!!
     resultsPage = """<div id = 'whole'><img src="/static/search.jpg" alt="Inquest Logo"><span id = 'whole'>""" + back + """<form action = "/results" method = "get" id = "query">
-    <input type = "text" value = """ + query + """ name = "keywords" id = "keywords">
+    <input oninput = "autoComp" type = "text" value = """ + query + """ name = "keywords" id = "keywords"><p><select onchange="applySelect()" size = 5 id = "dropdown"></select></p>
     <input id = "searchButton" type = "submit" name = "search" value = "Search"/></form><h5>Hello """ + curr_email + """!</h5></span></div><div id="so">""" + sobutton + """</div>"""
 
     #+ curr_email + sobutton + back
@@ -329,7 +329,7 @@ def print_result_page(query, curr_email, logged_in, results, curr_page):
                 resultsPage = resultsPage + "<td>" + create_page_link_btn(i+1) + "</td>" 
         resultsPage = resultsPage + "<td> " + npb + "</td></tr>"
 
-    return """<head><link rel="stylesheet" type="text/css" href="/static/resultspage.css"><link rel="shortcut icon" href="static/favicon.ico"></head><body>""" + resultsPage + "</body>" 
+    return """<head><script type="text/javascript" src="/static/inquest.js"></script><link rel="stylesheet" type="text/css" href="/static/resultspage.css"><link rel="shortcut icon" href="static/favicon.ico"></head><body>""" + resultsPage + "</body>" 
 
 @get('/results')
 def do_inquest() :
