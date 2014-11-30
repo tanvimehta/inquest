@@ -624,7 +624,7 @@ def main():
 
     mytrie = trie.add_words_to_trie(wordlist)
 
-    run(app=app,host='localhost', port=8080, debug=True)
+    run(app=app,host='0.0.0.0', port=80, debug=True)
 
 if __name__ == '__main__':
     main()
