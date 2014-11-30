@@ -26,7 +26,7 @@ def get_words_from_trie(trie, prefix):
 		if letter in current_dict:
 			current_dict = current_dict[letter]
 		else:
-			return False
+			return wordlist
 	else:
 		recursive_get_word(current_dict, prefix, wordlist)
 	return wordlist
