@@ -159,7 +159,17 @@ def redirect_page():
 def autocomp(): 
     in_put = request.query['input']
     wordList = trie.get_words_from_trie(mytrie, in_put)
-    return wordList[0] + ";" + wordList[1] + ";" + wordList[2] + ";" + wordList[3] + ";" + wordList[4]
+    if len(wordList) == 0: 
+        return ''
+    else: 
+        min_results = min(5, len(wordList))
+        word_str = ''
+        for i in range (0, min_results):
+            word_str = word_str + wordList[i]
+            if i < (min_results - 1):
+                word_str = word_str + ';'
+
+        return word_str
 
 @get('/signout')
 def signout():
