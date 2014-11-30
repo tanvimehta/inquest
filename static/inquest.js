@@ -1,4 +1,4 @@
-
+var numSuggestions = 5;
 function autoComp() {
 	var words = [];
   var url = "";
@@ -26,8 +26,11 @@ function autoComp() {
 
 function showOptions(wordList) {
   document.getElementById("dropdown").style.visibility = "visible";
-  for (i = 0; i < 5; i++) {
-    document.getElementById("dropdown").innerHTML = document.getElementById("dropdown").innerHTML + "<option value=\"word" + i + "\">" + wordList[i] + "</option>";
+  for (i = 0; i < numSuggestions; i++) {
+    if (wordList[i] != null)
+      document.getElementById("dropdown").innerHTML = document.getElementById("dropdown").innerHTML + "<option value=\"word" + i + "\">" + wordList[i] + "</option>";
+    else
+      break;
   }
 }
 

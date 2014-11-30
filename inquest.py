@@ -38,7 +38,7 @@ mytrie = {}
 
 global credentials 
 
-searchButton = """<form action = "/results" method = "get" id = "query">
+searchButton = """<form autocomplete="off" action = "/results" method = "get" id = "query">
                     <p><span class = "textbox"><input oninput="autoComp()" type = "text" name = "keywords" id = "keywords"/><input type = "submit" name = "search" value = "Search"/></span></p>
                     <p><select size = 5 id="dropdown" onchange="applySelect()"></select></p>
                    </form>"""
@@ -306,8 +306,8 @@ def print_result_page(query, curr_email, logged_in, results, curr_page):
         ppb = prev_page_button
 
     # Results Page!!!!!!
-    resultsPage = """<div id = 'whole'><img src="/static/search.jpg" alt="Inquest Logo"><span id = 'whole'>""" + back + """<form action = "/results" method = "get" id = "query">
-    <input oninput = "autoComp" type = "text" value = """ + query + """ name = "keywords" id = "keywords"><p><select onchange="applySelect()" size = 5 id = "dropdown"></select></p>
+    resultsPage = """<div id = 'whole'><img src="/static/search.jpg" alt="Inquest Logo"><span id = 'whole'>""" + back + """<form autocomplete="off" action = "/results" method = "get" id = "query">
+    <input oninput = "autoComp()" type = "text" value = """ + query + """ name = "keywords" id = "keywords"><p><select onchange="applySelect()" size = 5 id = "dropdown"></select></p>
     <input id = "searchButton" type = "submit" name = "search" value = "Search"/></form><h5>Hello """ + curr_email + """!</h5></span></div><div id="so">""" + sobutton + """</div>"""
 
     #+ curr_email + sobutton + back

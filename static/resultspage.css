@@ -176,7 +176,9 @@
 
 			#dropdown {
 				float: left;
-				width: 500px;
+				margin-left: 180px;
+				clear: right;
+				width: 200px;
 				padding-top: 0px;
 				margin-top: 0px;
 				size: 5;
