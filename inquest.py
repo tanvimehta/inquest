@@ -38,6 +38,8 @@ mytrie = {}
 
 global credentials 
 
+# Following are all the HTML components
+
 searchButton = """<form autocomplete="off" action = "/results" method = "get" id = "query">
                     <span class = "textbox"><input oninput="autoComp()" type = "text" name = "keywords" id = "keywords"/><input type = "submit" name = "search" value = "Search"/></span>
                     <select size = 5 id="dropdown" onchange="applySelect()"></select>
@@ -155,17 +157,36 @@ def redirect_page():
 
 @get('/autocomplete')
 def autocomp(): 
+    s = bottle.request.environ.get('beaker.session')
+    cur_email = ''
+    modify_word_list = False
+    num_recent_words_in_list = 0
+    if 'user' in s:
+        cur_email = s['user'] 
+        if cur_email in recent_list_dict:
+            modify_word_list = True
+
     in_put = request.query['input']
+    dont_check_alpha = not in_put.isalpha()
     wordList = trie.get_words_from_trie(mytrie, in_put)
     if len(wordList) == 0: 
         return ''
     else: 
+        if modify_word_list == True: 
+            modified_word_list = []
+            recent_list = recent_list_dict[cur_email]
+            for i in recent_list: 
+                if i in wordList: 
+                    wordList.remove(i)
+                    modified_word_list.append(i)
+                    num_recent_words_in_list = num_recent_words_in_list + 1
+            wordList = modified_word_list + wordList
         min_results = min(5, len(wordList))
-        word_str = ''
+        word_str = str(num_recent_words_in_list) + ';'
         count = 0
         i = 0
         while count < min_results and i < len(wordList): 
-            if wordList[i].isalpha():
+            if wordList[i].isalpha() or dont_check_alpha:
                 word_str = word_str + wordList[i]
                 if count < (min_results - 1):
                     word_str = word_str + ';'
@@ -320,7 +341,8 @@ def print_result_page(query, curr_email, logged_in, results, curr_page):
         description = results[starting_pt + i][4]
         if title == 'None':
             title = 'No Title'
-        title = eval(title)
+        if title != 'Calculator Results':     
+            title = eval(title)
 
         if description == 'None':
             description = 'No description'
@@ -389,9 +411,11 @@ def do_inquest() :
         return searchForm + "<p>Please enter a search query .</p></div>" + createRecentTable()  + "</body>"
     else: 
         
+        result = []
         value = mathOperations(words);
         if value != "":
-            return searchForm + "<p>" + value + "</p></div>" + createRecentTable()  + "</body>"
+            result.append((-1, 100, '', 'Calculator Results', value ))
+            #return searchForm + "<p>" + value + "</p></div>" + createRecentTable()  + "</body>"
 
         searched = words[0]
         con = lite.connect('keywords.db')
@@ -404,7 +428,6 @@ def do_inquest() :
             doc_id_set_str_set = cur.fetchone()
             doc_id_str = doc_id_set_str_set[0]
             doc_id_set = eval(doc_id_str)
-            result = []
             for doc_id_r in doc_id_set: 
                 cur.execute('SELECT rank FROM page_rank WHERE doc_id = ?',(doc_id_r,))
                 rank_set = cur.fetchone()
@@ -601,7 +624,7 @@ def main():
 
     mytrie = trie.add_words_to_trie(wordlist)
 
-    run(app=app,host='0.0.0.0', port=80, debug=True)
+    run(app=app,host='localhost', port=8080, debug=True)
 
 if __name__ == '__main__':
     main()
