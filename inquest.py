@@ -164,10 +164,15 @@ def autocomp():
     else: 
         min_results = min(5, len(wordList))
         word_str = ''
-        for i in range (0, min_results):
-            word_str = word_str + wordList[i]
-            if i < (min_results - 1):
-                word_str = word_str + ';'
+        count = 0
+        i = 0
+        while count < min_results and i < len(wordList): 
+            if wordList[i].isalpha():
+                word_str = word_str + wordList[i]
+                if count < (min_results - 1):
+                    word_str = word_str + ';'
+                count = count + 1
+            i = i+1
 
         return word_str
 
@@ -296,10 +301,8 @@ def print_result_page(query, curr_email, logged_in, results, curr_page):
     remaining = total_urls - starting_pt 
     to_print = min(remaining, NUM_LINKS_PER_PAGE)
     total_page = total_urls / NUM_LINKS_PER_PAGE
-    print total_page, total_urls, curr_page
     if total_urls == total_page * NUM_LINKS_PER_PAGE: 
         total_page = total_page - 1
-    print total_page
     if curr_page < total_page: 
         npb = next_page_button
     if curr_page > 0: 
@@ -364,8 +367,6 @@ def do_inquest() :
         logged_in = False
 
     query = request.query['keywords']
-    for i in request.query: 
-        print i, request.query[i]
     words = query.split()
 
     #if logged in create a history table
