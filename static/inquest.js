@@ -1,4 +1,4 @@
-var numSuggestions = 5;
+var numSuggestions = 6;
 var evt;
 var userQuery;
 
@@ -54,10 +54,14 @@ function getUserQuery(wholeQuery) {
 function showOptions(wordList, evt, query) {
   document.getElementById("dropdown").style.visibility = "visible";
   document.getElementById("dropdown").innerHTML = "";
-  for (i = 0; i < numSuggestions; i++) {
+  for (i = 1; i < numSuggestions; i++) {
     if (wordList[i] != undefined) {
       document.getElementById("dropdown").size = i + 1;
-      document.getElementById("dropdown").innerHTML = document.getElementById("dropdown").innerHTML + "<option value=\"word" + i + "\">" + wordList[i] + "</option>";
+      if (i <= parseInt(wordList[0]))
+        document.getElementById("dropdown").innerHTML = document.getElementById("dropdown").innerHTML + "<option style=\"color:#52188C;\" value=\"word" + i + "\">" + wordList[i] + "</option>";
+      else
+        document.getElementById("dropdown").innerHTML = document.getElementById("dropdown").innerHTML + "<option value=\"word" + i + "\">" + wordList[i] + "</option>";
+
     }
     else
       break;
