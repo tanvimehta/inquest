@@ -39,7 +39,7 @@ mytrie = {}
 global credentials 
 
 searchButton = """<form autocomplete="off" action = "/results" method = "get" id = "query">
-                    <span class = "textbox"><input oninput="autoComp()" type = "text" name = "keywords" id = "keywords"/><input type = "submit" name = "search" value = "Search"/></span>
+                    <span class = "textbox"><input onkeyup="autoComp()" type = "text" name = "keywords" id = "keywords"/><input type = "submit" name = "search" value = "Search"/></span>
                     <select size = 5 id="dropdown" onchange="applySelect()"></select>
                    </form>"""
 
@@ -308,7 +308,7 @@ def print_result_page(query, curr_email, logged_in, results, curr_page):
 
     # Results Page!!!!!!
     resultsPage = """<div id = 'whole'><img src="/static/search.jpg" alt="Inquest Logo"><span id = 'whole'>""" + back + """<form autocomplete="off" action = "/results" method = "get" id = "query">
-    <input oninput = "autoComp()" type = "text" value = """ + query + """ name = "keywords" id = "keywords">
+    <input onkeyup = "autoComp()" type = "text" value = """ + query + """ name = "keywords" id = "keywords">
     <input id = "searchButton" type = "submit" name = "search" value = "Search"/></form><h5>Hello """ + curr_email + """!</h5></span></div>
     <div id="so">""" + sobutton + """</div><p><select onchange="applySelect()" size = 5 id = "dropdown"></select></p>""" 
 
@@ -601,7 +601,7 @@ def main():
 
     mytrie = trie.add_words_to_trie(wordlist)
 
-    run(app=app,host='0.0.0.0', port=80, debug=True)
+    run(app=app,host="localhost", port=8080, debug=True)
 
 if __name__ == '__main__':
     main()

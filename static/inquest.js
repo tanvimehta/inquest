@@ -1,12 +1,26 @@
 var numSuggestions = 5;
+var evt;
+var userQuery;
+
+window.onload = function() {
+  document.getElementById("keywords").focus();
+};
+
 function autoComp() {
 	var words = [];
   var url = window.location.origin;
   document.getElementById("dropdown").innerHTML = "";
   document.getElementById("dropdown").style.visibility = "hidden";
     if (document.getElementById("keywords").value != "") {
-      url = url + "/autocomplete?input="+ document.getElementById("keywords").value;
+      index = getUserQuery(document.getElementById("keywords").value);
+      if (index > 0 )
+        userQuery = (document.getElementById("keywords").value).substring(0, index);
+      else
+        userQuery = document.getElementById("keywords").value;
+
+      url = url + "/autocomplete?input="+ userQuery;
       var xmlHttp = new XMLHttpRequest();
+      evt = event;
       xmlHttp.onreadystatechange=function()
         {
         if (xmlHttp.readyState==4 && xmlHttp.status==200)
@@ -14,7 +28,7 @@ function autoComp() {
             words = xmlHttp.responseText;
             if (words != "") {
               wordList = words.split(";");
-              showOptions(wordList);
+              showOptions(wordList, evt, userQuery);
             }
           }
         }
@@ -24,7 +38,20 @@ function autoComp() {
   }
 }
 
-function showOptions(wordList) {
+function getUserQuery(wholeQuery) {
+  textComponent = document.getElementById("keywords");
+  if (textComponent.selectionStart != undefined)
+  {
+    var startPos = textComponent.selectionStart;
+    var endPos = textComponent.selectionEnd;
+    selected = textComponent.value.substring(startPos, endPos)
+    return wholeQuery.indexOf(selected);
+  }
+  else
+    return -1
+}
+
+function showOptions(wordList, evt, query) {
   document.getElementById("dropdown").style.visibility = "visible";
   document.getElementById("dropdown").innerHTML = "";
   for (i = 0; i < numSuggestions; i++) {
@@ -35,14 +62,18 @@ function showOptions(wordList) {
     else
       break;
   }
-  
-  if (wordList[0] != undefined) {
-    currentValue = document.getElementById("keywords").value;
-    newValue = wordList[0];
-    start = currentValue.length;
-    end = newValue.length - 1;
-    document.getElementById("keywords").value = newValue;
-    createSelection(document.getElementById("keywords"), start, end);
+
+  var key = evt.keyCode || evt.charCode;
+
+    if( key > 48 && key < 90 ) {
+    if (wordList[0] != undefined) {
+      currentValue = query;
+      newValue = wordList[0];
+      start = currentValue.length;
+      end = newValue.length;
+      document.getElementById("keywords").value = newValue;
+      createSelection(document.getElementById("keywords"), start, end);
+    }
   }
 }
 
