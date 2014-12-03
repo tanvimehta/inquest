@@ -41,7 +41,7 @@ global credentials
 # Following are all the HTML components
 
 searchButton = """<form autocomplete="off" action = "/results" method = "get" id = "query">
-                    <span class = "textbox"><input onkeyup="autoComp()" type = "text" name = "keywords" id = "keywords"/><input type = "submit" name = "search" value = "Search"/></span>
+                    <span class = "textbox"><input onkeypress="autoComp()" onkeyup="autoComp()" type = "text" name = "keywords" id = "keywords"/><input type = "submit" name = "search" value = "Search"/></span>
                     <select size = 5 id="dropdown" onchange="applySelect()"></select>
                    </form>"""
 
@@ -329,7 +329,7 @@ def print_result_page(query, curr_email, logged_in, results, curr_page):
 
     # Results Page!!!!!!
     resultsPage = """<div id = 'whole'><img src="/static/search.jpg" alt="Inquest Logo"><span id = 'whole'>""" + back + """<form autocomplete="off" action = "/results" method = "get" id = "query">
-    <input onkeyup = "autoComp()" type = "text" value = """ + query + """ name = "keywords" id = "keywords">
+    <input onkeypress = "autoComp()" onkeyup = "autoComp()" type = "text" value = """ + query + """ name = "keywords" id = "keywords">
     <input id = "searchButton" type = "submit" name = "search" value = "Search"/></form><h5>Hello """ + curr_email + """!</h5></span></div>
     <div id="so">""" + sobutton + """</div><p><select onchange="applySelect()" size = 5 id = "dropdown"></select></p>""" 
 
