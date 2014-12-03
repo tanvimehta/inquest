@@ -418,6 +418,10 @@ def do_inquest() :
             #return searchForm + "<p>" + value + "</p></div>" + createRecentTable()  + "</body>"
 
         searched = words[0]
+        if not os.path.isfile('keywords.db'):
+            s.save()
+            return searchForm + "<p>No Match Found. Please try other keywords.</p></div>" + createRecentTable() + "</body>"
+
         con = lite.connect('keywords.db')
         cur = con.cursor()
         cur.execute('SELECT word_id FROM lexicon WHERE word = ?',(searched,))
@@ -613,16 +617,17 @@ def createRecentTable ():
 
 def main():
     global mytrie
-    con = lite.connect('keywords.db')
-    cur = con.cursor()
-    wordlist = []
-    cur.execute('SELECT word FROM lexicon')
-    word_set = cur.fetchall()
-    for i in word_set: 
-        clean_word = str(i[0])
-        wordlist.append(clean_word)
+    if os.path.isfile('keywords.db'):
+        con = lite.connect('keywords.db')
+        cur = con.cursor()
+        wordlist = []
+        cur.execute('SELECT word FROM lexicon')
+        word_set = cur.fetchall()
+        for i in word_set: 
+            clean_word = str(i[0])
+            wordlist.append(clean_word)
 
-    mytrie = trie.add_words_to_trie(wordlist)
+        mytrie = trie.add_words_to_trie(wordlist)
 
     run(app=app,host='0.0.0.0', port=80, debug=True)
 
