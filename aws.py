@@ -15,8 +15,8 @@ def init(d):
 		aws_access_key_id=key_id,
 		aws_secret_access_key=access_key)
 
-	# key = conn.create_key_pair('keyPair1')
-	# key.save('.')
+	key = conn.create_key_pair('keyPair1')
+	key.save('.')
 
 	groups = conn.get_all_security_groups()
 	found = False
@@ -30,7 +30,7 @@ def init(d):
 		group.authorize(ip_protocol='tcp', from_port=22, to_port=22, cidr_ip='0.0.0.0/0')
 		group.authorize(ip_protocol='tcp', from_port=80, to_port=80, cidr_ip='0.0.0.0/0')
 
-	resObj = conn.run_instances('ami-8caa1ce4', instance_type='t1.micro', security_groups=[group.name], key_name="keyPair0")
+	resObj = conn.run_instances('ami-8caa1ce4', instance_type='t1.micro', security_groups=[group.name], key_name="keyPair1")
 	return  (conn, resObj)
 
 def wait(conn, inst_id):
@@ -66,11 +66,13 @@ def run():
 		(k, v) = line.split()
 		d[k] = v
 
+	os.system('wget https://pypi.python.org/packages/source/b/boto/boto-2.34.0.tar.gz#md5=5556223d2d0cc4d06dd4829e671dcecd ; tar -zxvf boto-2.34.0.tar.gz')
+	os.system('cd boto-2.34.0; python setup.py install --user')
 	conn, resObj = init(d)
 	wait(conn, resObj.instances[0].id)
 	my_ip = static_add(conn, resObj)
 	wait_machine(my_ip.public_ip)
-	ip = copy(my_ip.public_ip, 'keyPair0.pem')
+	ip = copy(my_ip.public_ip, 'keyPair1.pem')
 	#return resObj, conn , ip
 	time.sleep(2)
 	print 'IP address = ' + ip + ' Instance Id ' + str(resObj.instances[0].id)
@@ -86,8 +88,6 @@ def copy(ip, key_file):
 	os.system('mkdir local_dir')
 	os.system('cp inquest.py local_dir/')
 	os.system('cp -r static local_dir/')
-	os.system('cp client_secrets.json local_dir/')
-	os.system('cp keywords.db local_dir/')
 	os.system('cp trie_implementation.py local_dir/')
 	scp_string = "scp -o StrictHostKeyChecking=no -i " + key_file + " -r local_dir " + remote_address
 	os.system(scp_string)
