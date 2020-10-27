@@ -6,7 +6,7 @@
 # * handle message activation / deactivation at the module level
 # * handle some basic but necessary stats'data (number of classes, methods...)
 # 
-[MASTER]
+[parent]
 
 
 # Specify a configuration file.

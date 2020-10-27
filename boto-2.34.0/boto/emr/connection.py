@@ -398,8 +398,8 @@ class EmrConnection(AWSQueryConnection):
 
     def run_jobflow(self, name, log_uri=None, ec2_keyname=None,
                     availability_zone=None,
-                    master_instance_type='m1.small',
-                    slave_instance_type='m1.small', num_instances=1,
+                    parent_instance_type='m1.small',
+                    child_instance_type='m1.small', num_instances=1,
                     action_on_failure='TERMINATE_JOB_FLOW', keep_alive=False,
                     enable_debugging=False,
                     hadoop_version=None,
@@ -426,11 +426,11 @@ class EmrConnection(AWSQueryConnection):
         :type availability_zone: str
         :param availability_zone: EC2 availability zone of the cluster
 
-        :type master_instance_type: str
-        :param master_instance_type: EC2 instance type of the master
+        :type parent_instance_type: str
+        :param parent_instance_type: EC2 instance type of the parent
 
-        :type slave_instance_type: str
-        :param slave_instance_type: EC2 instance type of the slave nodes
+        :type child_instance_type: str
+        :param child_instance_type: EC2 instance type of the child nodes
 
         :type num_instances: int
         :param num_instances: Number of instances in the Hadoop cluster
@@ -461,7 +461,7 @@ class EmrConnection(AWSQueryConnection):
         :param instance_groups: Optional list of instance groups to
             use when creating this job.
             NB: When provided, this argument supersedes num_instances
-            and master/slave_instance_type.
+            and parent/child_instance_type.
 
         :type ami_version: str
         :param ami_version: Amazon Machine Image (AMI) version to use
@@ -515,15 +515,15 @@ class EmrConnection(AWSQueryConnection):
         params.update(common_params)
 
         # NB: according to the AWS API's error message, we must
-        # "configure instances either using instance count, master and
-        # slave instance type or instance groups but not both."
+        # "configure instances either using instance count, parent and
+        # child instance type or instance groups but not both."
         #
         # Thus we switch here on the truthiness of instance_groups.
         if not instance_groups:
             # Instance args (the common case)
             instance_params = self._build_instance_count_and_type_args(
-                                                        master_instance_type,
-                                                        slave_instance_type,
+                                                        parent_instance_type,
+                                                        child_instance_type,
                                                         num_instances)
             params.update(instance_params)
         else:
@@ -710,15 +710,15 @@ class EmrConnection(AWSQueryConnection):
 
         return params
 
-    def _build_instance_count_and_type_args(self, master_instance_type,
-                                            slave_instance_type, num_instances):
+    def _build_instance_count_and_type_args(self, parent_instance_type,
+                                            child_instance_type, num_instances):
         """
-        Takes a master instance type (string), a slave instance type
+        Takes a parent instance type (string), a child instance type
         (string), and a number of instances. Returns a comparable dict
         for use in making a RunJobFlow request.
         """
-        params = {'Instances.MasterInstanceType': master_instance_type,
-                  'Instances.SlaveInstanceType': slave_instance_type,
+        params = {'Instances.parentInstanceType': parent_instance_type,
+                  'Instances.childInstanceType': child_instance_type,
                   'Instances.InstanceCount': num_instances}
         return params
 

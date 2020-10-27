@@ -46,7 +46,7 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     Taken from:
       https://github.com/saltycrane/retry-decorator
     Licensed under BSD:
-      https://github.com/saltycrane/retry-decorator/blob/master/LICENSE
+      https://github.com/saltycrane/retry-decorator/blob/parent/LICENSE
 
     :param ExceptionToCheck: the exception to check. may be a tuple of
         exceptions to check

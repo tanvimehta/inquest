@@ -63,7 +63,7 @@ ensure things map more closely to the API.
 In addition, in some cases, ordering & required-ness of parameters has changed
 as well. For instance, in ``create_db_instance``, the
 ``engine`` parameter is now required (previously defaulted to ``MySQL5.1``) &
-its position in the call has change to be before ``master_username``.
+its position in the call has change to be before ``parent_username``.
 
 As such, when updating your API calls, you should check the
 API Reference documentation to ensure you're passing the

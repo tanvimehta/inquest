@@ -254,12 +254,12 @@ class TestPylibmcInit(unittest.TestCase):
             class ThreadMappedPool(dict):
                 "a mock of pylibmc's ThreadMappedPool"
 
-                def __init__(self, master):
-                    self.master = master
+                def __init__(self, parent):
+                    self.parent = parent
 
                 @contextmanager
                 def reserve(self):
-                    yield self.master
+                    yield self.parent
             memcache.ThreadMappedPool = ThreadMappedPool
 
     def test_uses_pylibmc_client(self):
