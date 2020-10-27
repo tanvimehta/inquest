@@ -50,22 +50,22 @@ Starting an RDS Instance
 
 Creating a DB instance is easy. You can do so as follows::
 
-   >>> db = conn.create_dbinstance("db-master-1", 10, 'db.m1.small', 'root', 'hunter2')
+   >>> db = conn.create_dbinstance("db-parent-1", 10, 'db.m1.small', 'root', 'hunter2')
 
-This example would create a DB identified as ``db-master-1`` with 10GB of
+This example would create a DB identified as ``db-parent-1`` with 10GB of
 storage. This instance would be running on ``db.m1.small`` type, with the login
 name being ``root``, and the password ``hunter2``.
 
 To check on the status of your RDS instance, you will have to query the RDS connection again::
 
-    >>> instances = conn.get_all_dbinstances("db-master-1")
+    >>> instances = conn.get_all_dbinstances("db-parent-1")
     >>> instances
-    [DBInstance:db-master-1]
+    [DBInstance:db-parent-1]
     >>> db = instances[0]
     >>> db.status
     u'available'
     >>> db.endpoint
-    (u'db-master-1.aaaaaaaaaa.us-west-2.rds.amazonaws.com', 3306)
+    (u'db-parent-1.aaaaaaaaaa.us-west-2.rds.amazonaws.com', 3306)
 
 Creating a Security Group
 -------------------------
@@ -91,9 +91,9 @@ Once you have reached this step, you can connect to your RDS instance as you
 would with any other MySQL instance::
 
     >>> db.endpoint
-    (u'db-master-1.aaaaaaaaaa.us-west-2.rds.amazonaws.com', 3306)
+    (u'db-parent-1.aaaaaaaaaa.us-west-2.rds.amazonaws.com', 3306)
 
-    % mysql -h db-master-1.aaaaaaaaaa.us-west-2.rds.amazonaws.com -u root -phunter2
+    % mysql -h db-parent-1.aaaaaaaaaa.us-west-2.rds.amazonaws.com -u root -phunter2
     mysql>
 
 
@@ -102,15 +102,15 @@ Making a backup
 
 You can also create snapshots of your database very easily::
 
-    >>> db.snapshot('db-master-1-2013-02-05')
-    DBSnapshot:db-master-1-2013-02-05
+    >>> db.snapshot('db-parent-1-2013-02-05')
+    DBSnapshot:db-parent-1-2013-02-05
 
 
 Once this snapshot is complete, you can create a new database instance from
 it::
 
     >>> db2 = conn.restore_dbinstance_from_dbsnapshot(
-    ...    'db-master-1-2013-02-05',
+    ...    'db-parent-1-2013-02-05',
     ...    'db-restored-1',
     ...    'db.m1.small',
     ...    'us-west-2')

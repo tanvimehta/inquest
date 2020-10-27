@@ -174,10 +174,10 @@ class TestListInstanceGroups(AWSMockServiceTestCase):
             <EndDateTime>2014-01-24T02:19:46Z</EndDateTime>
           </Timeline>
         </Status>
-        <Name>Master instance group</Name>
+        <Name>parent instance group</Name>
         <RequestedInstanceCount>1</RequestedInstanceCount>
         <RunningInstanceCount>0</RunningInstanceCount>
-        <InstanceGroupType>MASTER</InstanceGroupType>
+        <InstanceGroupType>parent</InstanceGroupType>
       </member>
       <member>
         <Id>ig-aaaaaaaaaaab</Id>
@@ -227,10 +227,10 @@ class TestListInstanceGroups(AWSMockServiceTestCase):
         self.assertEqual(len(response.instancegroups), 2)
         self.assertTrue(isinstance(response.instancegroups[0], InstanceGroupInfo))
         self.assertEqual(response.instancegroups[0].id, 'ig-aaaaaaaaaaaaa')
-        self.assertEqual(response.instancegroups[0].instancegrouptype, "MASTER")
+        self.assertEqual(response.instancegroups[0].instancegrouptype, "parent")
         self.assertEqual(response.instancegroups[0].instancetype, "m1.large")
         self.assertEqual(response.instancegroups[0].market, "ON_DEMAND")
-        self.assertEqual(response.instancegroups[0].name, "Master instance group")
+        self.assertEqual(response.instancegroups[0].name, "parent instance group")
         self.assertEqual(response.instancegroups[0].requestedinstancecount, '1')
         self.assertEqual(response.instancegroups[0].runninginstancecount, '0')
         self.assertTrue(isinstance(response.instancegroups[0].status, ClusterStatus))
@@ -355,14 +355,14 @@ class TestListInstances(AWSMockServiceTestCase):
 
         response = self.service_connection.list_instances(
             cluster_id='j-123', instance_group_types=[
-                'MASTER',
+                'parent',
                 'TASK'
             ])
 
         self.assert_request_parameters({
             'Action': 'ListInstances',
             'ClusterId': 'j-123',
-            'InstanceGroupTypeList.member.1': 'MASTER',
+            'InstanceGroupTypeList.member.1': 'parent',
             'InstanceGroupTypeList.member.2': 'TASK',
             'Version': '2009-03-31'
         })
@@ -822,7 +822,7 @@ class DescribeJobFlowsTestBase(AWSMockServiceTestCase):
           <Placement>
             <AvailabilityZone>us-west-1c</AvailabilityZone>
           </Placement>
-          <MasterInstanceType>m1.large</MasterInstanceType>
+          <parentInstanceType>m1.large</parentInstanceType>
           <Ec2KeyName>my_key</Ec2KeyName>
           <KeepJobFlowAliveWhenNoSteps>true</KeepJobFlowAliveWhenNoSteps>
           <InstanceGroups>
@@ -838,8 +838,8 @@ class DescribeJobFlowsTestBase(AWSMockServiceTestCase):
               <LastStateChangeReason>Job flow terminated</LastStateChangeReason>
               <Market>ON_DEMAND</Market>
               <InstanceGroupId>ig-aaaaaa</InstanceGroupId>
-              <InstanceRole>MASTER</InstanceRole>
-              <Name>Master instance group</Name>
+              <InstanceRole>parent</InstanceRole>
+              <Name>parent instance group</Name>
             </member>
             <member>
               <CreationDateTime>2014-01-24T01:21:21Z</CreationDateTime>
@@ -857,11 +857,11 @@ class DescribeJobFlowsTestBase(AWSMockServiceTestCase):
               <Name>Core instance group</Name>
             </member>
           </InstanceGroups>
-          <SlaveInstanceType>m1.large</SlaveInstanceType>
-          <MasterInstanceId>i-aaaaaa</MasterInstanceId>
+          <childInstanceType>m1.large</childInstanceType>
+          <parentInstanceId>i-aaaaaa</parentInstanceId>
           <HadoopVersion>1.0.3</HadoopVersion>
           <NormalizedInstanceHours>12</NormalizedInstanceHours>
-          <MasterPublicDnsName>ec2-184-0-0-1.us-west-1.compute.amazonaws.com</MasterPublicDnsName>
+          <parentPublicDnsName>ec2-184-0-0-1.us-west-1.compute.amazonaws.com</parentPublicDnsName>
           <InstanceCount>3</InstanceCount>
           <TerminationProtected>false</TerminationProtected>
         </Instances>
@@ -889,14 +889,14 @@ class TestDescribeJobFlows(DescribeJobFlowsTestBase):
         self.assertEqual(jf.name, 'test analytics')
         self.assertEqual(jf.jobflowid, 'j-aaaaaa')
         self.assertEqual(jf.ec2keyname, 'my_key')
-        self.assertEqual(jf.masterinstancetype, 'm1.large')
+        self.assertEqual(jf.parentinstancetype, 'm1.large')
         self.assertEqual(jf.availabilityzone, 'us-west-1c')
         self.assertEqual(jf.keepjobflowalivewhennosteps, 'true')
-        self.assertEqual(jf.slaveinstancetype, 'm1.large')
-        self.assertEqual(jf.masterinstanceid, 'i-aaaaaa')
+        self.assertEqual(jf.childinstancetype, 'm1.large')
+        self.assertEqual(jf.parentinstanceid, 'i-aaaaaa')
         self.assertEqual(jf.hadoopversion, '1.0.3')
         self.assertEqual(jf.normalizedinstancehours, '12')
-        self.assertEqual(jf.masterpublicdnsname, 'ec2-184-0-0-1.us-west-1.compute.amazonaws.com')
+        self.assertEqual(jf.parentpublicdnsname, 'ec2-184-0-0-1.us-west-1.compute.amazonaws.com')
         self.assertEqual(jf.instancecount, '3')
         self.assertEqual(jf.terminationprotected, 'false')
 
@@ -917,8 +917,8 @@ class TestDescribeJobFlows(DescribeJobFlowsTestBase):
         self.assertEqual(ig.laststatechangereason, 'Job flow terminated')
         self.assertEqual(ig.market, 'ON_DEMAND')
         self.assertEqual(ig.instancegroupid, 'ig-aaaaaa')
-        self.assertEqual(ig.instancerole, 'MASTER')
-        self.assertEqual(ig.name, 'Master instance group')
+        self.assertEqual(ig.instancerole, 'parent')
+        self.assertEqual(ig.name, 'parent instance group')
 
     def test_describe_jobflows_no_args(self):
         self.set_http_response(200)
@@ -986,5 +986,5 @@ class TestRunJobFlow(AWSMockServiceTestCase):
             'Name': 'EmrCluster' },
             ignore_params_values=['ActionOnFailure', 'Instances.InstanceCount',
                                   'Instances.KeepJobFlowAliveWhenNoSteps',
-                                  'Instances.MasterInstanceType',
-                                  'Instances.SlaveInstanceType'])
+                                  'Instances.parentInstanceType',
+                                  'Instances.childInstanceType'])

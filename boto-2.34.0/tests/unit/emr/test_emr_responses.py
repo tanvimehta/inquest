@@ -70,8 +70,8 @@ JOB_FLOW_EXAMPLE = b"""
           <Placement>
             <AvailabilityZone>us-east-1a</AvailabilityZone>
           </Placement>
-          <SlaveInstanceType>m1.small</SlaveInstanceType>
-          <MasterInstanceType>m1.small</MasterInstanceType>
+          <childInstanceType>m1.small</childInstanceType>
+          <parentInstanceType>m1.small</parentInstanceType>
           <Ec2KeyName>myec2keyname</Ec2KeyName>
           <InstanceCount>4</InstanceCount>
           <KeepJobFlowAliveWhenNoSteps>true</KeepJobFlowAliveWhenNoSteps>
@@ -266,8 +266,8 @@ JOB_FLOW_COMPLETED = b"""
         </Steps>
         <JobFlowId>j-3H3Q13JPFLU22</JobFlowId>
         <Instances>
-          <SlaveInstanceType>m1.large</SlaveInstanceType>
-          <MasterInstanceId>i-64c21609</MasterInstanceId>
+          <childInstanceType>m1.large</childInstanceType>
+          <parentInstanceId>i-64c21609</parentInstanceId>
           <Placement>
             <AvailabilityZone>us-east-1b</AvailabilityZone>
           </Placement>
@@ -283,9 +283,9 @@ JOB_FLOW_COMPLETED = b"""
               <InstanceType>m1.large</InstanceType>
               <Market>ON_DEMAND</Market>
               <LastStateChangeReason>Job flow terminated</LastStateChangeReason>
-              <InstanceRole>MASTER</InstanceRole>
+              <InstanceRole>parent</InstanceRole>
               <InstanceGroupId>ig-EVMHOZJ2SCO8</InstanceGroupId>
-              <Name>master</Name>
+              <Name>parent</Name>
             </member>
             <member>
               <CreationDateTime>2010-10-21T01:00:25Z</CreationDateTime>
@@ -300,13 +300,13 @@ JOB_FLOW_COMPLETED = b"""
               <LastStateChangeReason>Job flow terminated</LastStateChangeReason>
               <InstanceRole>CORE</InstanceRole>
               <InstanceGroupId>ig-YZHDYVITVHKB</InstanceGroupId>
-              <Name>slave</Name>
+              <Name>child</Name>
             </member>
           </InstanceGroups>
           <NormalizedInstanceHours>40</NormalizedInstanceHours>
           <HadoopVersion>0.20</HadoopVersion>
-          <MasterInstanceType>m1.large</MasterInstanceType>
-          <MasterPublicDnsName>ec2-184-72-153-139.compute-1.amazonaws.com</MasterPublicDnsName>
+          <parentInstanceType>m1.large</parentInstanceType>
+          <parentPublicDnsName>ec2-184-72-153-139.compute-1.amazonaws.com</parentPublicDnsName>
           <Ec2KeyName>myubersecurekey</Ec2KeyName>
           <InstanceCount>10</InstanceCount>
           <KeepJobFlowAliveWhenNoSteps>false</KeepJobFlowAliveWhenNoSteps>
@@ -346,8 +346,8 @@ class TestEMRResponses(unittest.TestCase):
                             loguri='mybucket/subdir/',
                             name='MyJobFlowName',
                             availabilityzone='us-east-1a',
-                            slaveinstancetype='m1.small',
-                            masterinstancetype='m1.small',
+                            childinstancetype='m1.small',
+                            parentinstancetype='m1.small',
                             ec2keyname='myec2keyname',
                             keepjobflowalivewhennosteps='true')
 
@@ -364,8 +364,8 @@ class TestEMRResponses(unittest.TestCase):
                             loguri='s3n://example.emrtest.scripts/jobflow_logs/',
                             name='RealJobFlowName',
                             availabilityzone='us-east-1b',
-                            slaveinstancetype='m1.large',
-                            masterinstancetype='m1.large',
+                            childinstancetype='m1.large',
+                            parentinstancetype='m1.large',
                             ec2keyname='myubersecurekey',
                             keepjobflowalivewhennosteps='false')
         self.assertEquals(6, len(jobflow.steps))

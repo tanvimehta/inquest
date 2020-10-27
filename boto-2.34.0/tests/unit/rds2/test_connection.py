@@ -84,7 +84,7 @@ class TestRDS2Connection(AWSMockServiceTestCase):
                     "InstanceCreateTime": "2012-10-03T22:01:51.047Z",
                     "AllocatedStorage": 200,
                     "DBInstanceClass": "db.m1.large",
-                    "MasterUsername": "awsuser",
+                    "parentUsername": "awsuser",
                     "StatusInfos": [{
                         "DBInstanceStatusInfo": {
                             "Message": null,
@@ -147,7 +147,7 @@ class TestRDS2Connection(AWSMockServiceTestCase):
         self.assertEqual(db['AllocatedStorage'], 200)
         self.assertEqual(db['Endpoint']['Port'], 3306)
         self.assertEqual(db['DBInstanceClass'], 'db.m1.large')
-        self.assertEqual(db['MasterUsername'], 'awsuser')
+        self.assertEqual(db['parentUsername'], 'awsuser')
         self.assertEqual(db['AvailabilityZone'], 'us-west-2b')
         self.assertEqual(db['BackupRetentionPeriod'], 1)
         self.assertEqual(db['PreferredBackupWindow'], '10:30-11:00')
